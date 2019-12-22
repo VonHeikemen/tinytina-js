@@ -1,0 +1,34 @@
+{
+  "name": "tinytina-js",
+  "version": "0.1.0",
+  "description": "Collection runner. Reads a collection in a json file in feeds it to a http client to make a request",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "mocha --ui qunit tests/**/*.test.js",
+    "test:watch": "npm test -- --watch --reporter min",
+    "format": "prettier --single-quote --write src/**/*.js src/*.js tests/**/*.js"
+  },
+  "keywords": [
+    "cli",
+    "command-line",
+    "http",
+    "json"
+  ],
+  "author": "Heiker (https://github.com/VonHeikemen)",
+  "license": "MIT",
+  "dependencies": {
+    "@zeit/arg": "^1.0.0",
+    "ansi-colors": "^4.1.1",
+    "color-support": "^1.1.3",
+    "enquirer": "^2.3.2",
+    "expand-template": "^2.0.3",
+    "form-data": "^3.0.0",
+    "jsome": "^2.5.0",
+    "jsonfile": "^5.0.0",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.2",
+    "prettier": "^1.19.1"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "hide": ["api-key"],
+  "globals": {
+    "secret-thing": "no-one-should-see-me",
+    "name": "some",
+    "lastname": "body",
+    "fullname": "{name} {lastname}",
+    "email": "{test-email}"
+  },
+  "envs": {
+    "development": {
+      "host": "http://localhost:3000",
+      "real-email": "the-real-deal-in-dev",
+      "test-email": "not-real-deal"
+    },
+    "testing": {
+      "host": "https://test.example.com",
+      "real-email": "the-real-deal-in-test",
+      "test-email": "stuff"
+    }
+  },
+  "collections": [
+    {
+      "id": "short-id",
+      "name": "A collection",
+      "description": "This is a service collection",
+      "requests": [
+        {
+          "id": "also-short",
+          "name": "The full name of the thing",
+          "description": "What the thing does",
+          "url": "{host}/service/register",
+          "method": "POST",
+          "headers": [
+            { "name": "Authorization", "value": "{api-key}" }
+          ],
+          "data": [
+            { "name": "name", "value": "some test value" },
+            { "name": "lastname", "value": "{lastname}-ish" },
+            { "name": "email", "value": "{email}" },
+            { "name": "code", "value": "{secret-thing}" }
+          ],
+          "query": [
+            { "name": "stuff", "value": "this goes in the URL as a querystring" }
+          ],
+          "files": [
+            { "name": "image", "value": "/tmp/yourface.jpg" }
+          ]
+        }
+      ],
+      "collections": [
+        {
+          "id": "oh-look",
+          "name": "A nested collection",
+          "description": "I hope you see where i'm going with this",
+          "requests": [
+            {
+              "id": "download-face",
+              "name": "Download a face",
+              "url": "{host}/service/download",
+              "output": {
+                "path": "/i-dont-check-working-dir/{secret-thing}/faces",
+                "filename": "{fullname}face.jpg"
+              },
+              "query": [
+                { "name": "other-stuff", "value": "no method? Don't worry, this is GET" }
+              ]
+            },
+            {
+              "id": "guess-filename",
+              "url": "{host}/service/download",
+              "method": "GET",
+              "output": {
+                "path": "/tmp/really-use-full-paths"
+              }
+            }
+          ],
+          "collections": []
+        }
+      ]
+    },
+    {
+      "id": "another",
+      "requests": [
+        {
+          "name": "don't know why no id",
+          "url": "http://example.com?code={api-key}"
+        },
+        {
+          "url": "http://not-a-good-idea-but-still-possible.example.com"
+        }
+      ]
+    }
+  ]
+}
