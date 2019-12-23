@@ -1,6 +1,6 @@
 # Tinytina
 
-Is command-line utility that reads data from json a file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody ask for.
+Is a command-line utility that reads data from json a file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody ask for.
 
 ## Getting started
 
@@ -70,7 +70,7 @@ Running request with the "dev" environment:
 
 Setting an environment variable (apikey) from the command line
 ```
- tinytina --schema ./example.json --global "apikey:super-secret"
+ tinytina --schema ./example.json --global "apikey:super-secret" run auth:login
 ```
 
 Running a request in interactive mode:
