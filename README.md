@@ -4,7 +4,7 @@ Is a command-line utility that reads data from a json file and feeds it to an ht
 
 ## Getting started
 
-To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/). And for now you have to run `src/main.js` directly from `node`.
+To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/). And for now you have to run `src/main.js` directly with `node`.
 
 ### Installation
 Right now what you can do is clone/download the repository and install the dependencies yourself. This may change in the future.
@@ -19,14 +19,18 @@ Right now what you can do is clone/download the repository and install the depen
 ## Usage
 
 ### Using the CLI
-The `run` command is used to query the json schema for a one or more requests to execute. 
-This command has a limited interactive mode that you can use to inspect the before you send it.
 
-The `run-all` command executes every requests in the json schema.
+#### `tinytina [OPTIONS] run <collection-id>:<request-id> ...`
+The `run` command is used to query the json schema for a one or more requests to execute. This command has a limited interactive mode that you can use to inspect the data before you send it.
+
+It takes a list of "queries" that represent the path to the request in the schema. The query is made of two parts separated by `:`, the first part is the collection id and the other is a comma separated list of request id (or whatever you set with --request-prop)
+
+#### `tinytina [OPTIONS] run-all`
+Executes every requests in the json schema.
 
 ### Command Line Options
 - `-h`, `--help`<br/>
-  Shows this help message.
+  Shows usage information.
 
 - `-v`, `--version`<br/>
   Displays the current version of tinytina.
@@ -40,7 +44,7 @@ The `run-all` command executes every requests in the json schema.
 - `-e`, `--env`<br/>
   Specifies the set of variables that can be used in a collection.
 
-- `-g`, `--global`<br/>
+- `-g`, `--global` `<name>:<value>` <br/>
   Set an environment variable from the command-line.
 
 - `-hi`, `--hide`<br/>
