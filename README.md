@@ -1,10 +1,10 @@
 # Tinytina
 
-Is a command-line utility that reads data from json a file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody ask for.
+Is a command-line utility that reads data from a json file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody ask for.
 
 ## Getting started
 
-To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
+To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/). And for now you have to run `src/main.js` directly from `node`.
 
 ### Installation
 Right now what you can do is clone/download the repository and install the dependencies yourself. This may change in the future.
