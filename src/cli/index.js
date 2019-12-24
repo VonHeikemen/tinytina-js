@@ -22,7 +22,7 @@ const { http } = require('../common/request')(
   handle_download
 );
 
-const { bind, is_empty } = require('../common/utils');
+const { bind, is_empty, reject } = require('../common/utils');
 
 jsome.colors = {
   num: 'magenta', // stands for numbers
@@ -92,8 +92,7 @@ async function run_requests(reader, env, config, requests) {
 function run_collection(reader, state, config, query) {
   return reader
     .get_requests(state.collection, query)
-    .chain(bind(run_requests, reader, state.env, config))
-    .altchain(e => Promise.reject(e));
+    .cata(bind(run_requests, reader, state.env, config), reject);
 }
 
 function run_all(reader, state, config) {

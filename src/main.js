@@ -12,7 +12,8 @@ const {
   is_nil,
   is_empty,
   map,
-  reduce
+  reduce,
+  reject
 } = require('./common/utils');
 const Result = require('./common/Result');
 
@@ -138,7 +139,7 @@ async function main({
   });
 
   if (state.is_err) {
-    return state.altchain(Promise.reject);
+    return state.altchain(reject);
   }
 
   if (command.name === 'run') {

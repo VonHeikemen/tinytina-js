@@ -122,6 +122,10 @@ function bind(fn, ...args) {
   return fn.bind(fn, ...args);
 }
 
+function reject(arg) {
+  return Promise.reject(arg);
+}
+
 module.exports = {
   identity,
   is_nil,
