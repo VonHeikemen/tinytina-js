@@ -47,12 +47,8 @@ async function run_interactive(run, reader, state, query) {
     return Promise.reject('Invalid run query');
   }
 
-  let [result, error] = reader.get_requests(state.collection, query);
-
-  if (error) {
-    return Promise.reject(error);
-  }
-
+  const handle_error = e =>
+    Promise.reject(e === '' ? 'Request cancelled by user' : e);
   const run_prompt = async req => {
     const options = reader.build_prompt_options(state, form_to_request, req);
     const new_req = await new Form(options).run();
@@ -61,9 +57,11 @@ async function run_interactive(run, reader, state, query) {
     return next_action('Repeat request', () => run_prompt(new_req));
   };
 
-  return run_prompt(result[0]).catch(e =>
-    Promise.reject(e === '' ? 'Request cancelled by user' : e)
-  );
+  return reader
+    .get_requests(state.collection, query)
+    .map(res => res[0])
+    .chain(run_prompt)
+    .catch(handle_error);
 }
 
 module.exports = run_interactive;

@@ -2,6 +2,10 @@ function identity(arg) {
   return arg;
 }
 
+function constant(arg) {
+  return () => arg;
+}
+
 function is_nil(arg) {
   return arg == null;
 }
@@ -91,6 +95,33 @@ function shallow_copy(arg) {
   return map(identity, arg);
 }
 
+function path(keys, obj) {
+  if (typeof keys == 'string') {
+    keys = keys.split('.');
+  }
+
+  let result = obj;
+  let idx = 0;
+  while (idx < keys.length) {
+    if ((result == null) | (result == undefined)) {
+      return;
+    }
+    result = result[keys[idx]];
+    idx += 1;
+  }
+
+  return result;
+}
+
+function get_or(fallback, keys, obj) {
+  let result = path(keys, obj);
+  return is_nil(result) ? fallback : result;
+}
+
+function bind(fn, ...args) {
+  return fn.bind(fn, ...args);
+}
+
 module.exports = {
   identity,
   is_nil,
@@ -99,5 +130,7 @@ module.exports = {
   map,
   filter,
   reduce,
-  shallow_copy
+  shallow_copy,
+  get_or,
+  bind
 };

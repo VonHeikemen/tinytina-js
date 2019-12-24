@@ -6,7 +6,15 @@ const c = require('ansi-colors');
 const { run, help, version } = require('./cli/index.js');
 const { parse_query, param_to_env } = require('./cli/utils');
 const { create_reader } = require('./common/reader');
-const { is_nil, is_empty, map, reduce } = require('./common/utils');
+const {
+  bind,
+  get_or,
+  is_nil,
+  is_empty,
+  map,
+  reduce
+} = require('./common/utils');
+const Result = require('./common/Result');
 
 c.enabled = color_support;
 var debug = false;
@@ -56,21 +64,20 @@ function process_args(get_args) {
     return { command: { name: 'version' } };
   }
 
+  let argv = get_or([], '_', args);
   let opts = { command: {} };
 
-  opts.command.name = (args['_'] || [])[0];
+  opts.command.name = get_or('', [0], argv);
   opts.command.config = {
     raw_output: Boolean(args['--raw-response']),
-    interactive_mode: args['--interactive'] || false
+    interactive_mode: get_or(false, '--interactive', args)
   };
 
   switch (opts.command.name) {
     case 'run':
-      let arg_list = (args['_'] || []).slice(1);
-      let request_prop = args['--request-prop'] || 'id';
-      const parse = val => parse_query(request_prop, val);
+      const parse = bind(parse_query, get_or('id', '--request-prop', args));
 
-      opts.command.args = map(parse, arg_list);
+      opts.command.args = map(parse, argv.slice(1));
       break;
     case 'run-all':
       break;
@@ -88,9 +95,9 @@ function process_args(get_args) {
   }
 
   opts.schema_path = args['--schema'];
-  opts.schema_type = args['--schema-type'] || 'tinytina';
-  opts.hide_vars = args['--hide'] || [];
-  opts.env_name = args['--env'] || '';
+  opts.schema_type = get_or('tinytina', '--schema-type', args);
+  opts.hide_vars = get_or([], '--hide', args);
+  opts.env_name = get_or('', '--env', args);
   opts.env_vars = reduce(param_to_env, {}, args['--global']);
 
   return opts;
@@ -125,21 +132,21 @@ async function main({
 
   let reader = create_reader(schema_type);
 
-  let [state, error] = reader.create_state(schema, env_name, {
+  let state = reader.create_state(schema, env_name, {
     extra_vars: env_vars,
     hide_vars
   });
 
-  if (error) {
-    return Promise.reject(error);
+  if (state.is_err) {
+    return state.altchain(Promise.reject);
   }
 
   if (command.name === 'run') {
-    return run.collection(reader, state, command);
+    return run.collection(reader, state.unwrap_or({}), command);
   }
 
   if (command.name === 'run-all') {
-    return run.all(reader, state, command.config);
+    return run.all(reader, state.unwrap({}), command.config);
   }
 }
 

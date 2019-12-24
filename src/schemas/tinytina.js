@@ -1,6 +1,8 @@
 const expand = require('../common/expand')();
 const { init_state, create_env } = require('../common/state');
+const Result = require('../common/Result');
 const {
+  get_or,
   map,
   shallow_copy,
   is_empty,
@@ -13,7 +15,7 @@ function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
   let state = init_state();
 
   if (is_nil(schema.collections)) {
-    return [state, 'could not find collections in schema'];
+    return Result.Err('could not find collections in schema');
   }
 
   let env = {};
@@ -35,35 +37,35 @@ function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
   state.env = map(expand(new_env), new_env);
   state.env_name = name;
 
-  return [state, ''];
+  return Result.Ok(state);
 }
 
 function query_id(collection, empty, ids) {
-  let result = [];
+  let res = [];
   let query = [...ids];
   for (let request of collection) {
     for (let index in query) {
       if (query[index] === request.id) {
-        result.push(request);
+        res.push(request);
         query.splice(index, 1);
         if (query.length === 0) {
-          return [result, ''];
+          return Result.Ok(res);
         }
       }
     }
   }
 
-  return result.length ? [result, ''] : empty;
+  return res.length ? Result.Ok(result) : empty;
 }
 
 function query_prop(collection, empty, query) {
   let lowercase_query = map(str => str.toLowerCase(), query.requests);
-  let result = filter(
+  let res = filter(
     item => lowercase_query.includes(item[query.request_prop].toLowerCase()),
     collection.requests
   );
 
-  return result.length ? [result, ''] : empty;
+  return res.length ? Result.Ok(res) : empty;
 }
 
 function get_collection(collections, path) {
@@ -91,18 +93,18 @@ function get_requests(collections, query) {
   let collection = get_collection(collections, query.collection);
 
   if (is_empty(collection)) {
-    return [[], 'could not find collection'];
+    return Result.Err('could not find collection');
   }
 
   if (is_empty(collection.requests)) {
-    return [[], 'the collection has no requests'];
+    return Result.Err('the collection has no requests');
   }
 
   if (is_empty(query.requests)) {
-    return [collection.requests, ''];
+    return Result.Ok(collection.requests);
   }
 
-  const empty = [[], `could not find request ${query.request_prop}`];
+  const empty = Result.Err(`could not find request ${query.request_prop}`);
 
   switch (query.request_prop) {
     case 'id':
@@ -138,12 +140,11 @@ function build_fetch_options(env, request) {
     ? 'GET'
     : request.method.toUpperCase();
 
-  if (request.output && request.output.path) {
+  let output_path = get_or(false, 'output.path', request);
+  if (output_path) {
     result.output = {};
-    result.output.path = parse(request.output.path);
-    if (request.output.filename) {
-      result.output.path = parse(request.output.filename);
-    }
+    result.output.path = parse(output_path);
+    result.output.filename = parse(get_or('', 'output.filename', request));
   }
 
   if (result.opts.method === 'GET') {

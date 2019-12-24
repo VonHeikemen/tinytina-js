@@ -22,7 +22,7 @@ const { http } = require('../common/request')(
   handle_download
 );
 
-const { is_empty } = require('../common/utils');
+const { bind, is_empty } = require('../common/utils');
 
 jsome.colors = {
   num: 'magenta', // stands for numbers
@@ -79,7 +79,7 @@ function safe_parse(text) {
 }
 
 async function run_requests(reader, env, config, requests) {
-  const create_options = reader.build_fetch_options.bind(null, env);
+  const create_options = bind(reader.build_fetch_options, env);
   const responses = await Promise.all(http(requests, create_options));
 
   const show = config.raw_output ? console.log : safe_parse;
@@ -90,12 +90,10 @@ async function run_requests(reader, env, config, requests) {
 }
 
 function run_collection(reader, state, config, query) {
-  let [requests, error] = reader.get_requests(state.collection, query);
-  if (error) {
-    return Promise.reject(error);
-  }
-
-  return run_requests(reader, state.env, config, requests);
+  return reader
+    .get_requests(state.collection, query)
+    .chain(bind(run_requests, reader, state.env, config))
+    .altchain(e => Promise.reject(e));
 }
 
 function run_all(reader, state, config) {
