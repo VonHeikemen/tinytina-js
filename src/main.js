@@ -147,7 +147,7 @@ async function main({
   }
 
   if (command.name === 'run-all') {
-    return run.all(reader, state.unwrap({}), command.config);
+    return run.all(reader, state.unwrap_or({}), command.config);
   }
 }
 
