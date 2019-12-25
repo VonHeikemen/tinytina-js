@@ -73,7 +73,7 @@ function make_request(http, params) {
   return response;
 }
 
-function run(http, requests, create_options) {
+function run(http, create_options, requests) {
   return requests.map(params => http(create_options(params)));
 }
 

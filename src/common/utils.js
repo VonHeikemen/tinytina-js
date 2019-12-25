@@ -126,6 +126,36 @@ function reject(arg) {
   return Promise.reject(arg);
 }
 
+function resolved(arg) {
+  return Promise.resolve(arg);
+}
+
+function then(fn) {
+  return promise => promise.then(fn);
+}
+
+function pcatch(fn) {
+  return promise => promise.catch(fn);
+}
+
+function promise_all(arr) {
+  return Promise.all(arr);
+}
+
+function pipe() {
+  let fns = arguments;
+
+  return function _pipe() {
+    let acc = fns[0].apply(this, arguments);
+
+    for (var i = 1; i < fns.length; i++) {
+      acc = fns[i](acc);
+    }
+
+    return acc;
+  };
+}
+
 module.exports = {
   identity,
   is_nil,
@@ -136,5 +166,11 @@ module.exports = {
   reduce,
   shallow_copy,
   get_or,
-  bind
+  bind,
+  reject,
+  resolved,
+  then,
+  pcatch,
+  promise_all,
+  pipe
 };

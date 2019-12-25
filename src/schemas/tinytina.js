@@ -55,7 +55,7 @@ function query_id(collection, empty, ids) {
     }
   }
 
-  return res.length ? Result.Ok(res) : empty;
+  return empty.catchmap(msg => msg.concat(query.join(', ')));
 }
 
 function query_prop(collection, empty, query) {
@@ -104,17 +104,21 @@ function get_requests(collections, query) {
     return Result.Ok(collection.requests);
   }
 
-  const empty = Result.Err(`could not find request ${query.request_prop}`);
+  const empty = Result.Err(`could not find request ${query.request_prop} `);
+  let result = empty;
 
   switch (query.request_prop) {
     case 'id':
-      return query_id(collection.requests, empty, query.requests);
+      result = query_id(collection.requests, empty, query.requests);
+      break;
     case 'name':
     case 'description':
-      return query_prop(collection, empty, query);
+      result = query_prop(collection, empty, query);
+      break;
   }
 
-  return empty;
+  const append_err = msg => msg.concat(` in ${collection.id}`);
+  return result.catchmap(append_err);
 }
 
 function valid_post_type(type) {

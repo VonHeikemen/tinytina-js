@@ -1,3 +1,7 @@
+const arg = require('@zeit/arg');
+
+const { bind, get_or, is_nil, map, reduce } = require('../common/utils');
+
 function parse_query(request_prop, value) {
   let [collection_path = '', requests = ''] = value.split(':');
 
@@ -20,7 +24,91 @@ function param_to_env(state, value) {
   return state;
 }
 
+function process_args(process_argv) {
+  try {
+    var args = arg(process_argv, {
+      '--env': String,
+      '--global': [String],
+      '--hide': [String],
+      '--interactive': Boolean,
+      '--raw-response': Boolean,
+      '--request-prop': String,
+      '--schema': String,
+      '--debug': Boolean,
+      '--help': Boolean,
+      '--version': Boolean,
+      // '--schema-type': String,
+
+      '-e': '--env',
+      '-g': '--global',
+      '-h': '--help',
+      '-hi': '--hide',
+      '-i': '--interactive',
+      '-r': '--raw-response',
+      '-p': '--request-prop',
+      '-s': '--schema',
+      '-v': '--version'
+      // '-t': '--schema-type',
+    });
+  } catch (err) {
+    return { err };
+  }
+
+  if (Boolean(args['--help'])) {
+    return { command: { name: 'help' } };
+  }
+
+  if (Boolean(args['--version'])) {
+    return { command: { name: 'version' } };
+  }
+
+  let argv = get_or([], '_', args);
+  let opts = { command: {} };
+
+  opts.command.name = get_or('', [0], argv);
+  opts.command.config = {
+    raw_output: Boolean(args['--raw-response'])
+  };
+
+  switch (opts.command.name) {
+    case 'run':
+      const parse = bind(parse_query, get_or('id', '--request-prop', args));
+
+      opts.hide_vars = get_or([], '--hide', args);
+      opts.command.args = map(parse, argv.slice(1));
+
+      if (args['--interactive']) {
+        opts.command.name += '-interactive';
+      }
+
+      break;
+    case 'run-all':
+      break;
+    default:
+      return {
+        err: {
+          message: 'Must provide a valid command',
+          info: 'use the --help command to learn about the available commands'
+        }
+      };
+  }
+
+  if (is_nil(args['--schema'])) {
+    return {
+      err: { message: 'must provide --schema with a path to a json file' }
+    };
+  }
+
+  opts.schema_path = args['--schema'];
+  opts.schema_type = get_or('tinytina', '--schema-type', args);
+  opts.env_name = get_or('', '--env', args);
+  opts.env_vars = reduce(param_to_env, {}, args['--global']);
+
+  return opts;
+}
+
 module.exports = {
   parse_query,
-  param_to_env
+  param_to_env,
+  process_args
 };

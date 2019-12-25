@@ -1,5 +1,5 @@
 const { Form, Toggle } = require('enquirer');
-const { is_nil, is_empty, reduce } = require('../common/utils');
+const { bind, is_nil, is_empty, reduce, reject } = require('../common/utils');
 
 function form_to_request(form) {
   const to_request = function(state, value, key) {
@@ -37,31 +37,40 @@ async function next_action(message, fn) {
     name: 'question',
     enabled: 'Yes',
     disabled: 'No'
-  }).run();
+  })
+    .run()
+    .catch(e => false);
 
   return answer ? fn() : true;
 }
 
-async function run_interactive(run, reader, state, query) {
-  if (is_empty(query.collection)) {
-    return Promise.reject('Invalid run query');
-  }
+function prompt(options) {
+  return new Form(options).run();
+}
 
+async function run_interactive(
+  { run, prompt, next_action },
+  create_options,
+  request
+) {
   const handle_error = e =>
     Promise.reject(e === '' ? 'Request cancelled by user' : e);
+
   const run_prompt = async req => {
-    const options = reader.build_prompt_options(state, form_to_request, req);
-    const new_req = await new Form(options).run();
+    const options = create_options(form_to_request, req);
+    const new_req = await prompt(options);
 
     await run(new_req);
-    return next_action('Repeat request', () => run_prompt(new_req));
+    return next_action('Repeat request', bind(run_prompt, new_req));
   };
 
-  return reader
-    .get_requests(state.collection, query)
-    .map(res => res[0])
-    .chain(run_prompt)
+  return run_prompt(request)
+    .altchain(reject)
     .catch(handle_error);
 }
 
-module.exports = run_interactive;
+module.exports = {
+  interactive: run_interactive,
+  prompt,
+  next_action
+};
