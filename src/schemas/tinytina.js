@@ -55,7 +55,7 @@ function query_id(collection, empty, ids) {
     }
   }
 
-  return res.length ? Result.Ok(result) : empty;
+  return res.length ? Result.Ok(res) : empty;
 }
 
 function query_prop(collection, empty, query) {
