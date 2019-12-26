@@ -42,20 +42,20 @@ function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
 
 function query_id(collection, empty, ids) {
   let res = [];
-  let query = [...ids];
+  let query = new Set(ids);
   for (let request of collection) {
-    for (let index in query) {
-      if (query[index] === request.id) {
+    for (let index of query) {
+      if (index === request.id) {
         res.push(request);
-        query.splice(index, 1);
-        if (query.length === 0) {
+        query.delete(index);
+        if (query.size === 0) {
           return Result.Ok(res);
         }
       }
     }
   }
 
-  return empty.catchmap(msg => msg.concat(query.join(', ')));
+  return empty.catchmap(msg => msg.concat(Array.from(query).join(', ')));
 }
 
 function query_prop(collection, empty, query) {

@@ -15,7 +15,7 @@ const constant = arg => () => arg;
 const stub = constant(identity);
 
 const prompt = options => {
-  options.show = false
+  options.show = false;
   const form = new Form(options);
   form.once('run', async () => {
     await form.submit();
@@ -153,7 +153,11 @@ test('process one request', async function() {
 });
 
 test("don't allow multiple requests", function() {
-  const command = create_command('run-interactive', 'short-id:also-short', 'other:path');
+  const command = create_command(
+    'run-interactive',
+    'short-id:also-short',
+    'other:path'
+  );
   const effect = run
     .interactive(reader, create_state(), command)
     .map(eff => bind(eff, prompt, next_action))
@@ -196,7 +200,9 @@ suite('# cli - run-all command');
 
 test('runs all requests in the schema', function() {
   const command = create_command('run-all', 'short-id:also-short');
-  const effect = run.all(reader, create_state(), command.config).cata(identity, constant);
+  const effect = run
+    .all(reader, create_state(), command.config)
+    .cata(identity, constant);
 
   const requests = effect({ http: stub });
 
