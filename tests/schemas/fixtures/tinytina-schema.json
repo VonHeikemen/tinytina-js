@@ -88,6 +88,10 @@
         },
         {
           "url": "http://not-a-good-idea-but-still-possible.example.com"
+        },
+        {
+          "id": "has-id",
+          "url": "http://that-is-better.example.com"
         }
       ]
     }

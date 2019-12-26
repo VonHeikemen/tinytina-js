@@ -58,14 +58,14 @@ function run_interactive(reader, state, { config, args }) {
 
   const request = reader
     .get_requests(state.collection, args[0])
-    .map(res => res[0]);
+    .chain(res => res[0]);
 
   if (request.is_err) {
     return request;
   }
 
   const fetch_options = bind(reader.build_fetch_options, state.env);
-  const prompt_options = bind(reader.build_prompt_options, state.env);
+  const prompt_options = bind(reader.build_prompt_options, state);
 
   function _effect(prompt, next_action, { http }) {
     const run = req => http(fetch_options, config.raw_output)([req]);

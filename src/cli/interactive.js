@@ -31,7 +31,7 @@ function form_to_request(form) {
   return result;
 }
 
-async function next_action(message, fn) {
+async function next_action(message, fn, req) {
   const answer = await new Toggle({
     message,
     name: 'question',
@@ -41,7 +41,7 @@ async function next_action(message, fn) {
     .run()
     .catch(e => false);
 
-  return answer ? fn() : true;
+  return answer ? fn(req) : true;
 }
 
 function prompt(options) {
@@ -61,15 +61,14 @@ async function run_interactive(
     const new_req = await prompt(options);
 
     await run(new_req);
-    return next_action('Repeat request', bind(run_prompt, new_req));
+    return next_action('Repeat request', run_prompt, new_req);
   };
 
-  return run_prompt(request)
-    .altchain(reject)
-    .catch(handle_error);
+  return run_prompt(request).catch(handle_error);
 }
 
 module.exports = {
+  form_to_request,
   interactive: run_interactive,
   prompt,
   next_action

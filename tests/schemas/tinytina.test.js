@@ -69,7 +69,7 @@ test('get all requests from a collection', function() {
   const requests = reader.get_all_requests(state.collection);
 
   t.ok(requests.length, 'requests is not empty');
-  t.equal(requests.length, 5, 'got all requests in the schema');
+  t.equal(requests.length, 6, 'got all requests in the schema');
 });
 
 test('transform request from schema to a fetch options object', function() {

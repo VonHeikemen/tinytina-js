@@ -93,11 +93,15 @@ function get_requests(collections, query) {
   let collection = get_collection(collections, query.collection);
 
   if (is_empty(collection)) {
-    return Result.Err('could not find collection');
+    return Result.Err(
+      `could not find collection ${query.collection.join('.')}`
+    );
   }
 
   if (is_empty(collection.requests)) {
-    return Result.Err('the collection has no requests');
+    return Result.Err(
+      `the collection ${query.collection.join('.')} has no requests`
+    );
   }
 
   if (is_empty(query.requests)) {
