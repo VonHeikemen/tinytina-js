@@ -43,9 +43,10 @@ const {
   map,
   then,
   pipe,
+  reject,
   promise_all
 } = require('../common/utils');
-const { Ok } = require('../common/Result');
+const { Ok, tryit } = require('../common/Result');
 
 function handle_files(files, form) {
   for (let key in files) {
@@ -54,7 +55,13 @@ function handle_files(files, form) {
 }
 
 async function handle_download(http_request, output, url) {
-  const response = await http_request;
+  const stat = tryit(fs.lstatSync, output.path).unwrap_or({ isDirectory: () => false });
+
+  if(!stat.isDirectory()) {
+    return Promise.reject(`${output.path} directory doesn't exists`);
+  }
+
+  const response = await http_request();
   let filename = output.filename;
 
   if (is_empty(filename)) {

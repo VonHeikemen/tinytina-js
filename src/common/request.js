@@ -61,16 +61,16 @@ function make_request(http, params) {
 
   const { opts, type, body, files } = params;
 
-  const response =
+  const request =
     opts.method === 'GET'
-      ? http.get(full_url, opts)
-      : http.post[type](full_url, body, files, opts);
+      ? () => http.get(full_url, opts)
+      : () => http.post[type](full_url, body, files, opts);
 
   if (params.output) {
-    return http.handle_download(response, params.output, params.url);
+    return http.handle_download(request, params.output, params.url);
   }
 
-  return response;
+  return request();
 }
 
 function run(http, create_options, requests) {

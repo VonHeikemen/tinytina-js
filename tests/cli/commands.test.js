@@ -30,13 +30,13 @@ const next_action = (message, fn, req) => {
 
 suite('# cli - run command');
 
-test('get one request from one collection', function() {
+test('get one request from one collection', async function() {
   const command = create_command('run', 'short-id:also-short');
   const effect = run
     .collection(reader, create_state(), command)
     .cata(identity, constant);
 
-  const collections = effect({ http: stub });
+  const collections = await effect({ http: stub });
 
   t.ok(Array.isArray(collections), 'collections is an array');
   t.deepEqual(collections.length, 1, 'collections has one element');
@@ -47,7 +47,7 @@ test('get one request from one collection', function() {
   t.equal(requests[0].id, 'also-short', '');
 });
 
-test('get multiple requests from one collection', function() {
+test('get multiple requests from one collection', async function() {
   const command = create_command(
     'run',
     'short-id.oh-look:guess-filename,download-face'
@@ -56,7 +56,7 @@ test('get multiple requests from one collection', function() {
     .collection(reader, create_state(), command)
     .cata(identity, constant);
 
-  const collections = effect({ http: stub });
+  const collections = await effect({ http: stub });
 
   t.ok(Array.isArray(collections), 'collections is an array');
   t.deepEqual(collections.length, 1, 'collections has one element');
@@ -68,13 +68,13 @@ test('get multiple requests from one collection', function() {
   t.equal(requests[1].id, 'guess-filename', '');
 });
 
-test('get all requests from one collection', function() {
+test('get all requests from one collection', async function() {
   const command = create_command('run', 'another');
   const effect = run
     .collection(reader, create_state(), command)
     .cata(identity, constant);
 
-  const collections = effect({ http: stub });
+  const collections = await effect({ http: stub });
 
   t.ok(Array.isArray(collections), 'collections is an array');
   t.deepEqual(collections.length, 1, 'collections has one element');
@@ -84,7 +84,7 @@ test('get all requests from one collection', function() {
   t.equal(requests.length, 3, 'retrieved all requests');
 });
 
-test('get requests from multiple collections', function() {
+test('get requests from multiple collections', async function() {
   const command = create_command(
     'run',
     'short-id:also-short',
@@ -94,7 +94,7 @@ test('get requests from multiple collections', function() {
     .collection(reader, create_state(), command)
     .cata(identity, constant);
 
-  const collections = effect({ http: stub });
+  const collections = await effect({ http: stub });
 
   t.ok(Array.isArray(collections), 'collections is an array');
   t.equal(collections.length, 2, 'collections has all elements');
@@ -131,6 +131,21 @@ test('report request not found', function() {
 
   const lines = report.split('\n');
   t.equal(lines[1], 'could not find request id also-wrong in short-id', '');
+});
+
+test('capture request error', async function() {
+  const command = create_command('run', 'short-id:also-short');
+  const effect = run
+    .collection(reader, create_state(), command)
+    .cata(identity, constant);
+
+  const expected_error = 'a random error';
+  const stub = () => () => Promise.reject(expected_error);
+
+  const report = await effect({ http: stub }).catch(identity);
+  t.equal(typeof report, 'string', '');
+
+  t.equal(report, expected_error, '');
 });
 
 suite('# cli - run command interactive mode');

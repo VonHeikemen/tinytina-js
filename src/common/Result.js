@@ -76,8 +76,17 @@ function Result(value) {
   return Ok(value);
 }
 
+function tryit(fn, ...args) {
+  try{
+    return Ok(fn.apply(fn, args));
+  } catch (e) {
+    return Err(e);
+  }
+}
+
 module.exports = {
   of: Result,
   Err,
-  Ok
+  Ok,
+  tryit
 };

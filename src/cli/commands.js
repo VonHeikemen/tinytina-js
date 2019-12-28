@@ -45,7 +45,7 @@ function run_collection(reader, state, { config, args }) {
   }
 
   function _effect({ http }) {
-    return map(http(create_options, config.raw_output), requests.success);
+    return Promise.all(map(http(create_options, config.raw_output), requests.success));
   }
 
   return Result.Ok(_effect);
