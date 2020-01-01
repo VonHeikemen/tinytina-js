@@ -8,7 +8,8 @@ const {
   is_empty,
   is_nil,
   filter,
-  reduce
+  reduce,
+  what_is
 } = require('../common/utils');
 
 function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
@@ -61,7 +62,7 @@ function query_id(collection, empty, ids) {
 function query_prop(collection, empty, query) {
   let lowercase_query = map(str => str.toLowerCase(), query.requests);
   let res = filter(
-    item => lowercase_query.includes(item[query.request_prop].toLowerCase()),
+    item => lowercase_query.includes((item[query.request_prop] || '').toLowerCase()),
     collection.requests
   );
 
@@ -159,13 +160,19 @@ function build_fetch_options(env, request) {
     return result;
   }
 
-  result.body = expand_data(request.data);
   result.files = expand_data(request.files);
-
   result.type = valid_post_type(request.type) ? request.type : 'urlencoded';
 
-  if (request.files && result.type != 'form') {
+  if (what_is(request.data) == '[object Object]') {
+    result.type = 'json';
+  } else if (request.files && result.type == 'urlencoded') {
     result.type = 'form';
+  }
+
+  if (result.type == 'json') {
+    result.body = parse(request.data);
+  } else {
+    result.body = expand_data(request.data);
   }
 
   return result;
@@ -233,6 +240,10 @@ function build_prompt_options(state, form_to_request, request) {
         method = 'GET';
         break;
     }
+  }
+
+  if (method != 'GET' && what_is(request.data) == '[object Object]') {
+    return { error: "Can't render form. 'data' needs to be an array" };
   }
 
   const form_header = message => [

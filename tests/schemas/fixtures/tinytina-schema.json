@@ -46,6 +46,25 @@
           "files": [
             { "name": "image", "value": "/tmp/yourface.jpg" }
           ]
+        },
+        {
+          "id": "json-data",
+          "url": "{host}/service/register",
+          "method": "POST",
+          "headers": [
+            { "name": "Authorization", "value": "{api-key}" }
+          ],
+          "data": {
+            "name": "some test value",
+            "lastname": "{lastname}",
+            "email": "{email}",
+            "code": {
+              "payload": "{secret-thing}"
+            }
+          },
+          "query": [
+            { "name": "stuff", "value": "this goes in the URL as a querystring" }
+          ]
         }
       ],
       "collections": [

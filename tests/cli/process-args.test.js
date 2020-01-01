@@ -59,7 +59,7 @@ test('gather arguments for "help" command', function() {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
-test('gather arguments for "help" command', function() {
+test('gather arguments for "version" command', function() {
   const expected = { command: { name: 'version' } };
 
   const result = process_args(cli_input(['run', 'auth:login', '--version']));

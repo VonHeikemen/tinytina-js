@@ -45,7 +45,9 @@ function run_collection(reader, state, { config, args }) {
   }
 
   function _effect({ http }) {
-    return Promise.all(map(http(create_options, config.raw_output), requests.success));
+    return Promise.all(
+      map(http(create_options, config.raw_output), requests.success)
+    );
   }
 
   return Result.Ok(_effect);
@@ -58,7 +60,7 @@ function run_interactive(reader, state, { config, args }) {
 
   const request = reader
     .get_requests(state.collection, args[0])
-    .chain(res => res[0]);
+    .map(res => res[0]);
 
   if (request.is_err) {
     return request;
@@ -69,7 +71,11 @@ function run_interactive(reader, state, { config, args }) {
 
   function _effect(prompt, next_action, { http }) {
     const run = req => http(fetch_options, config.raw_output)([req]);
-    return interactive({ run, next_action, prompt }, prompt_options, request);
+    return interactive(
+      { run, next_action, prompt },
+      prompt_options,
+      request.unwrap_or({})
+    );
   }
 
   return Result.Ok(_effect);

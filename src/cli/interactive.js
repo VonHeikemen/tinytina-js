@@ -58,6 +58,11 @@ async function run_interactive(
 
   const run_prompt = async req => {
     const options = create_options(form_to_request, req);
+
+    if (options.error) {
+      return Promise.reject(options.error);
+    }
+
     const new_req = await prompt(options);
 
     await run(new_req);

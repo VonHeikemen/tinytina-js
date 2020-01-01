@@ -184,6 +184,22 @@ test("don't allow multiple requests", function() {
   t.equal(report, "Can't process multiple requests in interactive mode", '');
 });
 
+test("don't allow request.data object", async function() {
+  const command = create_command(
+    'run-interactive',
+    'short-id:json-data'
+  );
+  const effect = run
+    .interactive(reader, create_state(), command)
+    .map(eff => bind(eff, prompt, next_action))
+    .cata(identity, constant);
+
+  const report = await effect({ http: stub }).catch(identity);
+
+  t.equal(typeof report, 'string', '');
+  t.equal(report, "Can't render form. 'data' needs to be an array", '');
+});
+
 test('report collection not found', function() {
   const command = create_command('run', 'wrong-id:also-wrong');
   const effect = run
@@ -221,7 +237,7 @@ test('runs all requests in the schema', function() {
 
   const requests = effect({ http: stub });
 
-  t.equal(requests.length, 6, 'got all requests');
+  t.equal(requests.length, 7, 'got all requests');
 });
 
 suite('# cli - version command');

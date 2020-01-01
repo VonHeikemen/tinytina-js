@@ -77,7 +77,7 @@ function Result(value) {
 }
 
 function tryit(fn, ...args) {
-  try{
+  try {
     return Ok(fn.apply(fn, args));
   } catch (e) {
     return Err(e);

@@ -55,9 +55,11 @@ function handle_files(files, form) {
 }
 
 async function handle_download(http_request, output, url) {
-  const stat = tryit(fs.lstatSync, output.path).unwrap_or({ isDirectory: () => false });
+  const stat = tryit(fs.lstatSync, output.path).unwrap_or({
+    isDirectory: () => false
+  });
 
-  if(!stat.isDirectory()) {
+  if (!stat.isDirectory()) {
     return Promise.reject(`${output.path} directory doesn't exists`);
   }
 

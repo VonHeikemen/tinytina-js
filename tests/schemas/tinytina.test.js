@@ -69,7 +69,7 @@ test('get all requests from a collection', function() {
   const requests = reader.get_all_requests(state.collection);
 
   t.ok(requests.length, 'requests is not empty');
-  t.equal(requests.length, 6, 'got all requests in the schema');
+  t.equal(requests.length, 7, 'got all requests in the schema');
 });
 
 test('transform request from schema to a fetch options object', function() {
@@ -85,6 +85,35 @@ test('transform request from schema to a fetch options object', function() {
   const options = reader.build_fetch_options(state.env, requests[0]);
 
   t.deepEqual(options, expected.fetch_options, '');
+});
+
+test('fetch options: handle request.data object', function() {
+  const expected_options = {
+    ...expected.fetch_options,
+    files: undefined,
+    type: 'json',
+    body: {
+      ...expected.fetch_options.body,
+      lastname: 'body',
+      code: {
+        payload: 'no-one-should-see-me'
+      }
+    }
+  };
+
+  const state = reader
+    .create_state(schema, 'development', {
+      extra_vars: { 'api-key': '456' }
+    })
+    .unwrap_or({});
+
+  const query = parse_query('id', 'short-id:json-data');
+
+  const requests = reader.get_requests(state.collection, query).unwrap_or([{}]);
+
+  const options = reader.build_fetch_options(state.env, requests[0]);
+
+  t.deepEqual(options, expected_options, '');
 });
 
 test('transform request from schema to a prompt options object', function() {
