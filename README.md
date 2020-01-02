@@ -1,6 +1,6 @@
 # Tinytina
 
-Is a command-line utility that reads data from a json file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody ask for.
+Is a command-line utility that reads data from a json file and feeds it to an http client. Is like the mix of `curl` and `postman` that nobody asked for.
 
 ## Getting started
 
@@ -27,6 +27,9 @@ It takes a list of "queries" that represent the path to the request in the schem
 
 #### `tinytina [OPTIONS] run-all`
 Executes every requests in the json schema.
+
+#### `tinytina [OPTIONS] list [arg]`
+It shows a list with the metada of the requests in the schema. If 'path' is provided as a first argument it will show a list of valid path that you can use with the `run` command.
 
 ### Command Line Options
 - `-h`, `--help`<br/>
@@ -102,6 +105,16 @@ Running all requests in a schema
  tinytina --schema ./example.json run-all
 ```
 
+List the data of all the requests in the schema
+```
+ tinytina --schema ./example.json list
+```
+
+List only the paths to the requests in the schema
+```
+ tinytina --schema ./example.json list path
+```
+
 ### JSON Schema Structure
 A schema is a json file that contains all the data necesary to execute a request as well information about the context or environment available. It looks like this [one](https://github.com/VonHeikemen/tinytina-js/tree/master/tests/schemas/fixtures/tinytina-schema.json)
 
@@ -131,9 +144,10 @@ A schema is a json file that contains all the data necesary to execute a request
 | `url`         | The route you want to "visit." |
 | `method`      | The http method | 
 | `type`        | It can be `json`, `urlencoded` or `form`. This is used when the method is POST. |
+| `output`      | When present it will try to download the response to a file. It should be an object with the properties "path" and "filename". If "filename" is omitted it will try to guess the name from the response headers. |
 | `headers`     | The http headers. |
 | `query`       | Params to be used as a query string. |
-| `data`        | Params to be used in a POST request. |
+| `data`        | Params to be used in a POST request. It can be an array of objects with the properties "name" and "value" or a json object. If it is a json object it will be converted to a string and the header 'Content-type' will be set to 'application/json.'|
 | `files`       | A list of files to be uploaded. |
-|               | "headers", "query", "data" and "files" must be arrays of objects these objects must have "name" and "value" properties.
+|               | "headers", "query" and "files" must be arrays of objects these objects must have "name" and "value" properties.
 

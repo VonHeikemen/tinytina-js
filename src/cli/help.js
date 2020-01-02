@@ -6,6 +6,7 @@ module.exports = function help() {
   USAGE
       tinytina --help
       tinytina --version
+      tinytina list [arg]
       tinytina [OPTIONS] run [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] run-all 
 
@@ -51,14 +52,20 @@ module.exports = function help() {
             An object with the keys
               - id: A short string to identify the request.
               - name: A proper name for the request.
-              - description: What the requests does
-              - url: The route you want to "visit" 
-              - method: The http method
+              - description: What the requests does.
+              - url: The route you want to "visit."
+              - method: The http method.
+              - type: type of POST request. It can be "urlencoded", "form" or "json".
+              - output: When present it will try to download the response to a file. It should be an object with the
+                properties "path" and "filename". If "filename" is omitted it will try to guess the name 
+                from the response headers.
               - headers: The http headers. 
               - query: Params to be used as a query string.
-              - data: Params to be used in a POST request
-              - files: A list of files to be uploaded
-              - "headers", "query", "data" and "files" must be arrays of objects, 
+              - data: Params to be used in a POST request. It can be an array of objects with the 
+                properties "name" and "value" or a json object. If it is a json object it will be converted to a string
+                and the header 'Content-type' will be set to 'application/json.'
+              - files: A list of files to be uploaded.
+              - "headers", "query" and "files" must be arrays of objects, 
                  these objects must have "name" and "value" properties
 
   EXAMPLES
@@ -76,16 +83,22 @@ module.exports = function help() {
       Running a request in interactive mode:
           tinytina --schema ./example.json --interactive run auth:login
 
-      Hide an environment variables in interactive mode
+      Hide an environment variables in interactive mode:
           tinytina --schema ./example.json --hide password --hide token --interactive run auth:login
 
-      Running multiple requests of the same collection
+      Running multiple requests of the same collection:
           tinytina --schema ./example.json run auth:login,logout
 
-      Running multiple requests of different collections
+      Running multiple requests of different collections:
           tinytina --schema ./example.json run auth:login user:get-posts
-      
-      Running all requests in a schema
+
+      Running all requests in a schema:
           tinytina --schema ./example.json run-all
+
+      List the data of all the requests in the schema:
+          tinytina --schema ./example.json list
+
+      List only the paths to the requests in the schema:
+          tinytina --schema ./example.json list path
 `;
 };
