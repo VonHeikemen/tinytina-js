@@ -1,7 +1,7 @@
 const jsonfile = require('jsonfile');
 
 const { prompt, next_action } = require('./cli/interactive');
-const { run, help, version } = require('./cli/commands.js');
+const { run, help, version, list } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
 const { http, log, pretty_err } = require('./cli/effects');
 const { create_reader } = require('./common/reader');
@@ -47,6 +47,9 @@ async function main({
       return help();
     case 'version':
       return version();
+    case 'list':
+      state = await create_state();
+      return list(reader, state, command);
     case 'run':
       state = await create_state();
       return run.collection(reader, state, command);

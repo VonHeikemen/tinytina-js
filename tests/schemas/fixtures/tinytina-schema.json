@@ -94,7 +94,20 @@
               }
             }
           ],
-          "collections": []
+          "collections": [
+            {
+              "id": "3rd-level",
+              "requests": [
+                {
+                  "id": "lonely-get",
+                  "name": "deeply nested",
+                  "description": "A nested request",
+                  "url": "{host}/service/download",
+                  "method": "GET"
+                }
+              ]
+            }
+          ]
         }
       ]
     },

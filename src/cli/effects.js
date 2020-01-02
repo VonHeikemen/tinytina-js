@@ -115,8 +115,8 @@ function http_client(get_options, raw_output) {
   };
 }
 
-function log_effect(raw_output, fn) {
-  const effect = ({ log }) => log(raw_output)(fn());
+function log_effect(raw_output, fn, ...rest) {
+  const effect = ({ log }) => log(raw_output)(fn.apply(fn, rest));
   return Ok(effect);
 }
 

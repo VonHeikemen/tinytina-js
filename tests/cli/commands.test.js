@@ -4,7 +4,7 @@ const { Form } = require('enquirer');
 
 const { is_empty, bind } = require('../../src/common/utils');
 const { parse_query } = require('../../src/cli/utils');
-const { run } = require('../../src/cli/commands');
+const { run, list } = require('../../src/cli/commands');
 const version = require('../../src/cli/version');
 const { command_context } = require('./helpers');
 
@@ -185,10 +185,7 @@ test("don't allow multiple requests", function() {
 });
 
 test("don't allow request.data object", async function() {
-  const command = create_command(
-    'run-interactive',
-    'short-id:json-data'
-  );
+  const command = create_command('run-interactive', 'short-id:json-data');
   const effect = run
     .interactive(reader, create_state(), command)
     .map(eff => bind(eff, prompt, next_action))
@@ -237,7 +234,7 @@ test('runs all requests in the schema', function() {
 
   const requests = effect({ http: stub });
 
-  t.equal(requests.length, 7, 'got all requests');
+  t.equal(requests.length, 8, 'got all requests');
 });
 
 suite('# cli - version command');
@@ -247,4 +244,24 @@ test('version is in sync with package.json', function() {
 
   t.ok(pkg_version, 'pkg_version is empty');
   t.equal(version(), 'v' + pkg_version, '');
+});
+
+suite('# cli - list command');
+
+test('render list of requests paths', function() {
+  const expected = [
+    '',
+    'short-id:also-short',
+    'short-id:json-data',
+    'short-id.oh-look:download-face',
+    'short-id.oh-look:guess-filename',
+    'short-id.oh-look.3rd-level:lonely-get',
+    'another:has-id'
+  ];
+
+  const command = { name: 'list', args: ['path'] };
+  const effect = list(reader, create_state(), command).cata(identity, constant);
+
+  const result = effect({ log: stub });
+  t.equal(result, expected.join('\n'), 'list of requests path');
 });

@@ -69,7 +69,7 @@ test('get all requests from a collection', function() {
   const requests = reader.get_all_requests(state.collection);
 
   t.ok(requests.length, 'requests is not empty');
-  t.equal(requests.length, 7, 'got all requests in the schema');
+  t.equal(requests.length, 8, 'got all requests in the schema');
 });
 
 test('transform request from schema to a fetch options object', function() {
@@ -132,4 +132,70 @@ test('transform request from schema to a prompt options object', function() {
 
   options.result = '';
   t.deepEqual(options, expected.prompt_options, '');
+});
+
+test('get flatten list of requests metadata', function() {
+  const expected = {
+    name: 'deeply nested',
+    description: 'A nested request',
+    id: 'lonely-get',
+    url: '{host}/service/download',
+    depth: 3,
+    path: 'short-id.oh-look.3rd-level'
+  };
+
+  const state = reader
+    .create_state(schema, 'development', {
+      extra_vars: { 'api-key': '456' }
+    })
+    .unwrap_or({});
+
+  const requests = reader.list_requests(state.collection);
+
+  t.ok(requests.length, 'requests is not empty');
+  t.equal(requests.length, 8, 'got all requests in the schema');
+  t.deepEqual(requests[4], expected, 'got expected metadata');
+});
+
+test('transform metadata list to a string', function() {
+  const args = [
+    {
+      name: 'request 1',
+      description: '',
+      id: 'req-1',
+      url: '{host}/service/download',
+      depth: 1,
+      path: 'short-id'
+    },
+    {
+      name: 'request 2',
+      description: 'a request',
+      id: 'req-2',
+      url: '{host}/service/download',
+      depth: 2,
+      path: 'short-id.oh-look'
+    },
+    {
+      name: 'request 3',
+      description: 'an id-less request',
+      id: '',
+      url: '{host}/service/request-3',
+      depth: 2,
+      path: 'short-id.oh-look'
+    }
+  ];
+
+  const expected = `
+${args[0].path}:${args[0].id}
+    ${args[0].name}
+${args[1].path}:${args[1].id}
+    ${args[1].name}
+    ${args[1].description}
+${args[2].path}
+    ${args[2].url}
+    ${args[2].name}
+    ${args[2].description}`;
+
+  const list = reader.list_to_string('', args);
+  t.equal(list, expected, '');
 });

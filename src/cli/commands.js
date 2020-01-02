@@ -81,6 +81,11 @@ function run_interactive(reader, state, { config, args }) {
   return Result.Ok(_effect);
 }
 
+function list(reader, state, { args }) {
+  const list = reader.list_requests(state.collection);
+  return reader.list_to_string(args[0], list);
+}
+
 module.exports = {
   run: {
     all: run_all,
@@ -88,5 +93,6 @@ module.exports = {
     interactive: run_interactive
   },
   help: bind(log_effect, true, help),
-  version: bind(log_effect, true, version)
+  version: bind(log_effect, true, version),
+  list: (...args) => log_effect(true, list, ...args)
 };

@@ -66,9 +66,6 @@ function process_args(process_argv) {
   let opts = { command: {} };
 
   opts.command.name = get_or('', [0], argv);
-  opts.command.config = {
-    raw_output: Boolean(args['--raw-response'])
-  };
 
   switch (opts.command.name) {
     case 'run':
@@ -76,13 +73,22 @@ function process_args(process_argv) {
 
       opts.hide_vars = get_or([], '--hide', args);
       opts.command.args = map(parse, argv.slice(1));
+      opts.command.config = {
+        raw_output: Boolean(args['--raw-response'])
+      };
 
       if (args['--interactive']) {
         opts.command.name += '-interactive';
       }
 
       break;
+    case 'list':
+      opts.command.args = argv.slice(1);
+      break;
     case 'run-all':
+      opts.command.config = {
+        raw_output: Boolean(args['--raw-response'])
+      };
       break;
     default:
       return {

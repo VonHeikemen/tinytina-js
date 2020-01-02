@@ -3,17 +3,13 @@ const { bind, map } = require('../../src/common/utils');
 const tinytina = require('../../src/schemas/tinytina.js');
 const example_schema = require('../schemas/fixtures/tinytina-schema.json');
 
-const fake_args = (name = '') => ({
+const fake_args = (name = '', ...args) => ({
   command: {
     name,
-    config: {
-      raw_output: false
-    },
-    args: [parse_query('id', 'auth:login')]
+    args
   },
   schema_path: './example.json',
   schema_type: 'tinytina',
-  hide_vars: ['password', 'api'],
   env_name: 'dev',
   env_vars: {
     token: '123',
@@ -30,11 +26,7 @@ const cli_input = args =>
     '--global',
     'token:123',
     '--global',
-    'api:secret',
-    '--hide',
-    'password',
-    '--hide',
-    'api'
+    'api:secret'
   ].concat(args);
 
 function command_context() {

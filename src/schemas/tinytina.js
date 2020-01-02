@@ -9,6 +9,7 @@ const {
   is_nil,
   filter,
   reduce,
+  pipe,
   what_is
 } = require('../common/utils');
 
@@ -62,7 +63,8 @@ function query_id(collection, empty, ids) {
 function query_prop(collection, empty, query) {
   let lowercase_query = map(str => str.toLowerCase(), query.requests);
   let res = filter(
-    item => lowercase_query.includes((item[query.request_prop] || '').toLowerCase()),
+    item =>
+      lowercase_query.includes((item[query.request_prop] || '').toLowerCase()),
     collection.requests
   );
 
@@ -178,13 +180,14 @@ function build_fetch_options(env, request) {
   return result;
 }
 
-function flatten_requests(collection, depth = 15, result = []) {
+function flatten_requests(reducer, collection, depth = 15, result = []) {
   for (let item of collection) {
     let { requests = [] } = item;
-    result.push(...requests);
+    item.depth = depth;
+    result = reducer(result, requests, item);
 
     if (depth > 1 && item.collections) {
-      flatten_requests(item.collections, depth - 1, result);
+      flatten_requests(reducer, item.collections, depth - 1, result);
     }
   }
 
@@ -192,7 +195,73 @@ function flatten_requests(collection, depth = 15, result = []) {
 }
 
 function get_all_requests(collection) {
-  return flatten_requests(collection);
+  const fn = (acc, req) => (acc.push(...req), acc);
+  return flatten_requests(fn, collection);
+}
+
+function list_requests(collection) {
+  let path = '';
+  let max_depth = 15;
+  let curr_depth = max_depth;
+  let prev_depth = max_depth;
+  const make_path = (depth, id) => {
+    if (id == null) {
+      return id;
+    }
+
+    if (prev_depth === depth) {
+      path = id;
+    }
+
+    if (prev_depth > depth && curr_depth != depth) {
+      curr_depth = depth;
+      path += `.${id}`;
+    }
+
+    return path;
+  };
+
+  const get_metadata = src => i => ({
+    name: i.name || '',
+    description: i.description || '',
+    id: i.id || '',
+    url: i.url || '',
+    depth: max_depth + 1 - src.depth,
+    path: make_path(src.depth, src.id)
+  });
+
+  const fn = (acc, req, src) => {
+    const items = map(get_metadata(src), req);
+    acc.push(...items);
+    return acc;
+  };
+
+  return flatten_requests(fn, collection);
+}
+
+function list_to_string(show, list) {
+  const to_string = req => {
+    let str = req.path;
+    switch (show) {
+      case 'path':
+        return req.id ? `${str}:${req.id}` : '';
+      case 'full':
+      default:
+        const id = req.id ? `${str}:${req.id}` : `${str}\n    ${req.url}`;
+        return (
+          id +
+          (req.name ? `\n    ${req.name}` : '') +
+          (req.description ? `\n    ${req.description}` : '')
+        );
+    }
+  };
+
+  const fn = (acc, item) => {
+    const result = to_string(item);
+    return is_empty(result) ? acc : acc.concat('\n', result);
+  };
+
+  return reduce(fn, '', list);
 }
 
 function parse_val(state, value) {
@@ -302,5 +371,7 @@ module.exports = {
   get_requests,
   get_all_requests,
   get_collection,
-  build_prompt_options
+  build_prompt_options,
+  list_requests,
+  list_to_string
 };

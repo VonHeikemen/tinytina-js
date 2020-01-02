@@ -22,27 +22,64 @@ test('parse collection query to object', function() {
 });
 
 test('gather arguments for "run" command', function() {
-  const expected = fake_args('run');
+  const args = fake_args('run', parse_query('id', 'auth:login'));
+  const expected = {
+    ...args,
+    command: {
+      ...args.command,
+      config: {
+        raw_output: false
+      }
+    },
+    hide_vars: ['password', 'api']
+  };
 
-  const result = process_args(cli_input(['run', 'auth:login']));
+  const result = process_args(
+    cli_input(['--hide', 'password', '--hide', 'api', 'run', 'auth:login'])
+  );
 
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
 test('gather arguments for "run" in interactive mode', function() {
-  const expected = fake_args('run-interactive');
+  const args = fake_args('run-interactive', parse_query('id', 'auth:login'));
+  const expected = {
+    ...args,
+    command: {
+      ...args.command,
+      config: {
+        raw_output: false
+      }
+    },
+    hide_vars: ['password', 'api']
+  };
 
   const result = process_args(
-    cli_input(['run', 'auth:login', '--interactive'])
+    cli_input([
+      '--hide',
+      'password',
+      '--hide',
+      'api',
+      'run',
+      'auth:login',
+      '--interactive'
+    ])
   );
 
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
 test('gather arguments for "run-all" command', function() {
-  const expected = fake_args('run-all');
-  delete expected.command.args;
-  delete expected.hide_vars;
+  const args = fake_args('run-all');
+  const expected = {
+    ...args,
+    command: {
+      name: 'run-all',
+      config: {
+        raw_output: false
+      }
+    }
+  };
 
   const result = process_args(cli_input(['run-all', 'auth:login']));
 
@@ -63,6 +100,20 @@ test('gather arguments for "version" command', function() {
   const expected = { command: { name: 'version' } };
 
   const result = process_args(cli_input(['run', 'auth:login', '--version']));
+
+  t.deepEqual(result, expected, 'arguments object has the right shape');
+});
+
+test('gather arguments for "list" command', function() {
+  const expected = {
+    ...fake_args('list'),
+    command: {
+      name: 'list',
+      args: ['path']
+    }
+  };
+
+  const result = process_args(cli_input(['list', 'path']));
 
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
