@@ -4,10 +4,13 @@ Is a command-line utility that reads data from a json file and feeds it to an ht
 
 ## Getting started
 
-To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/). And for now you have to run `src/main.js` directly with `node`.
+To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
 
 ### Installation
-Right now what you can do is clone/download the repository and install the dependencies yourself. This may change in the future.
+
+The easiest way to get tinytina is by going to the [release page](https://github.com/VonHeikemen/tinytina-js/releases), downloading tinytina.zip and extracting the minified version with all the dependencies included (except node.js). Now you can use it directly with `node` or make it executable or create an alias, whatever your heart desires.
+
+You can also use the source. Clone/download the repository and install the dependencies yourself.
 
 ```
  git clone https://github.com/VonHeikemen/tinytina-js 
@@ -63,7 +66,7 @@ It shows a list with the metadata of the requests in the schema. If 'path' is pr
   Disable the colors and format of the response body.
 
 ### Examples
-Assuming you somehow bundled project into a single file and make it executable with the name tinytina ([@zeit/ncc](https://github.com/zeit/ncc) can help you with that)
+Assuming you downloaded the release version and made it executable with the name tinytina.
 
 Running a single request:
 ```
