@@ -29,7 +29,7 @@ It takes a list of "queries" that represent the path to the request in the schem
 Executes every requests in the json schema.
 
 #### `tinytina [OPTIONS] list [arg]`
-It shows a list with the metada of the requests in the schema. If 'path' is provided as a first argument it will show a list of valid path that you can use with the `run` command.
+It shows a list with the metadata of the requests in the schema. If 'path' is provided as a first argument it will show a list of valid path that you can use with the `run` command.
 
 ### Command Line Options
 - `-h`, `--help`<br/>
@@ -116,12 +116,12 @@ List only the paths to the requests in the schema
 ```
 
 ### JSON Schema Structure
-A schema is a json file that contains all the data necesary to execute a request as well information about the context or environment available. It looks like this [one](https://github.com/VonHeikemen/tinytina-js/tree/master/tests/schemas/fixtures/tinytina-schema.json)
+A schema is a json file that contains all the data necesary to execute a request as well information about the context or environment available. It looks like this [one](https://github.com/VonHeikemen/tinytina-js/tree/master/tests/schemas/fixtures/tinytina-schema.json).
 
 #### Top Level Properties
 | Property     | Description   |
 |--------------|---------------|
-| `globals`    | An object containing a set of variables that can be used in anywhere else in the collection. It can be a user name, a url, a common id for testing. |
+| `globals`    | An object containing a set of variables that can be used anywhere else in the collection. It can be a user name, a url, a common id for testing. |
 | `envs`       | An object. Each key will be considered an environment (like globals) that will complement the globals. This can be use to store context dependent variables like a host. |
 | `hide`       | An array. A list of variables in the environment that you want to hide in interactive mode. |
 | `collections`| An array of collection objects. |
@@ -151,3 +151,7 @@ A schema is a json file that contains all the data necesary to execute a request
 | `files`       | A list of files to be uploaded. |
 |               | "headers", "query" and "files" must be arrays of objects these objects must have "name" and "value" properties.
 
+#### Environment variables
+Inside a request object you can use placeholders for a piece of data that can change depending on the context. They can be used in the following properties `url`, `output`, `headers`, `query`, `data` and `files`.
+
+For example, you can have a "host" variable that has the value `http://localhost:3000` in development and for testing you use `http://example.com`, you can write your URLs like this `{host}/api/method`. Another common thing is to use a token in a authorization header, instead of writing into the schema you can add your token with the `--global` option (`--global "token:some-token"`) and use it in your header like this `{ "name": "Authorization", "value": "{token}" }`.

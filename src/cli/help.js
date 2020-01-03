@@ -10,6 +10,19 @@ module.exports = function help() {
       tinytina [OPTIONS] run [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] run-all 
 
+  COMMANDS
+      run:
+          Use it to query the json schema and execute a one or more requests. The query is made of two parts
+          separated by ':', the first part is the collection id and the other is a comma separated list of 
+          request id (or whatever you set with --request-prop)
+
+      run-all:
+          Executes every requests in the json schema.
+      
+      list:
+          It shows a list with the metadata of the requests in the schema. If 'path' is provided as a first 
+          argument it will show a list of valid path that you can use with the run command.
+
   OPTIONS
       -h, --help                          Shows this help message
       -v, --version                       Displays the current version of tinytina
