@@ -8,13 +8,15 @@ To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via packa
 
 ### Installation
 
+You can do it in different ways.
+
 #### Download minified script
 
 Go to the [release page](https://github.com/VonHeikemen/tinytina-js/releases), download tinytina.zip and extract the minified version with all the dependencies included. Now you can use it directly with `node` or make it executable or create an alias, whatever your heart desires.
 
 #### Using the npm install command
 
-You can use npm to install from the repository.
+As of version 0.1.1 you can use npm to install from the repository. This way you can have the `tinytina` command available.
 
 Fetch from master.
 
@@ -22,7 +24,7 @@ Fetch from master.
 npm install --global github:VonHeikemen/tinytina-js
 ```
 
-Install from one of the available [tags](https://github.com/VonHeikemen/tinytina-js/tags). 
+Or install it from one of the available [tags](https://github.com/VonHeikemen/tinytina-js/tags). 
 
 ```
 npm install --global github:VonHeikemen/tinytina-js#<tag>
