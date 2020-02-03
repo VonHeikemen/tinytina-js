@@ -9,6 +9,10 @@ const { bind, is_empty, map, reduce } = require('../common/utils');
 const Result = require('../common/Result');
 
 function show(fn) {
+  return (...args) => log_effect(true, fn, ...args);
+}
+
+function safe_show(fn) {
   return (...args) => {
     const result = fn.apply(fn, args);
 
@@ -16,7 +20,7 @@ function show(fn) {
       return result;
     }
 
-    return log_effect(true, fn, ...args);
+    return log_effect(true, () => result.unwrap_or(''));
   };
 }
 
@@ -154,7 +158,7 @@ function convert_to(reader, state, { args, config }) {
       });
   }
 
-  return commands.join('\n\n');
+  return Result.Ok(commands.join('\n\n'));
 }
 
 module.exports = {
@@ -166,5 +170,5 @@ module.exports = {
   help: show(help),
   version: show(version),
   list: show(list),
-  convert_to: show(convert_to)
+  convert_to: safe_show(convert_to)
 };
