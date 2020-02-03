@@ -4,7 +4,7 @@ Is a command-line utility that reads data from a json file and feeds it to an ht
 
 ## Getting started
 
-To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
+To run Tinytina, ensure that you have Node.js >= v11. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
 
 ### Installation
 
