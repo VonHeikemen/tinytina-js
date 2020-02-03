@@ -90,7 +90,7 @@ It transforms a request query or a list of queries into a shell commands and pri
 - `-r`, `--raw-response`<br/>
   Disable the colors and format of the response body.
 
-- `--arg-separator`
+- `--arg-separator`<br />
 Set the delimeter between arguments in the commands shown by 'convert-to.'
 
 ### Examples
