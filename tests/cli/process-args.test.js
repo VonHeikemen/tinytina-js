@@ -118,6 +118,26 @@ test('gather arguments for "list" command', function() {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
+test('gather arguments for "convert-to" command', function() {
+  const expected = {
+    ...fake_args('convert-to'),
+    command: {
+      name: 'convert-to',
+      args: [parse_query('id', 'auth:login')],
+      config: {
+        syntax: 'curl',
+        arg_separator: ' \\\n'
+      }
+    }
+  };
+
+  const result = process_args(
+    cli_input(['--arg-separator', ' \\\n', 'convert-to', 'curl', 'auth:login'])
+  );
+
+  t.deepEqual(result, expected, 'arguments object has the right shape');
+});
+
 test('return error when --schema is missing', function() {
   const expected = {
     err: { message: 'must provide --schema with a path to a json file' }

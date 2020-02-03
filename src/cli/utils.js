@@ -27,6 +27,7 @@ function param_to_env(state, value) {
 function process_args(process_argv) {
   try {
     var args = arg(process_argv, {
+      '--arg-separator': String,
       '--env': String,
       '--global': [String],
       '--hide': [String],
@@ -68,9 +69,8 @@ function process_args(process_argv) {
   opts.command.name = get_or('', [0], argv);
 
   switch (opts.command.name) {
-    case 'run':
+    case 'run': {
       const parse = bind(parse_query, get_or('id', '--request-prop', args));
-
       opts.hide_vars = get_or([], '--hide', args);
       opts.command.args = map(parse, argv.slice(1));
       opts.command.config = {
@@ -82,14 +82,26 @@ function process_args(process_argv) {
       }
 
       break;
-    case 'list':
-      opts.command.args = argv.slice(1);
-      break;
-    case 'run-all':
+    }
+    case 'run-all': {
       opts.command.config = {
         raw_output: Boolean(args['--raw-response'])
       };
       break;
+    }
+    case 'list': {
+      opts.command.args = argv.slice(1);
+      break;
+    }
+    case 'convert-to': {
+      const parse = bind(parse_query, get_or('id', '--request-prop', args));
+      opts.command.config = {
+        syntax: argv[1],
+        arg_separator: get_or(' ', '--arg-separator', args)
+      };
+      opts.command.args = map(parse, argv.slice(2));
+      break;
+    }
     default:
       return {
         err: {

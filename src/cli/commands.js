@@ -1,3 +1,5 @@
+const { URLSearchParams } = require('url');
+
 const { interactive } = require('./interactive');
 const { log_effect } = require('./effects');
 const help = require('./help');
@@ -5,6 +7,34 @@ const version = require('./version');
 
 const { bind, is_empty, map, reduce } = require('../common/utils');
 const Result = require('../common/Result');
+
+function show(fn) {
+  return (...args) => {
+    const result = fn.apply(fn, args);
+
+    if (result.is_err) {
+      return result;
+    }
+
+    return log_effect(true, fn, ...args);
+  };
+}
+
+function search_requests(reader, state, args) {
+  let requests = { success: [], failed: [] };
+  for (let query of args) {
+    reader.get_requests(state.collection, query).cata(
+      result => requests.success.push(result),
+      err => requests.failed.push(err)
+    );
+  }
+
+  if (requests.failed.length) {
+    return Result.Err('Search failed:\n' + requests.failed.join('\n'));
+  }
+
+  return Result.Ok(requests.success);
+}
 
 function run_all(reader, state, config) {
   const create_options = bind(reader.build_fetch_options, state.env);
@@ -27,26 +57,15 @@ function run_collection(reader, state, { config, args }) {
 
   const create_options = bind(reader.build_fetch_options, state.env);
 
-  let requests = reduce(
-    function(acc, query) {
-      reader.get_requests(state.collection, query).cata(
-        result => acc.success.push(result),
-        err => acc.failed.push(err)
-      );
+  const requests = search_requests(reader, state, args);
 
-      return acc;
-    },
-    { success: [], failed: [] },
-    args
-  );
-
-  if (requests.failed.length) {
-    return Result.Err('Search failed:\n' + requests.failed.join('\n'));
+  if (requests.is_err) {
+    return requests;
   }
 
   function _effect({ http }) {
     return Promise.all(
-      map(http(create_options, config.raw_output), requests.success)
+      map(http(create_options, config.raw_output), requests.unwrap_or([]))
     );
   }
 
@@ -86,13 +105,66 @@ function list(reader, state, { args }) {
   return reader.list_to_string(args[0], list);
 }
 
+function convert_to(reader, state, { args, config }) {
+  const result = is_empty(args)
+    ? Result.Ok(reader.get_all_requests(state.collection))
+    : search_requests(reader, state, args);
+
+  if (result.is_err) {
+    return result;
+  }
+
+  let commands = '';
+  const requests = result.unwrap_or([]).flat();
+
+  switch (config.syntax) {
+    case 'curl': {
+      let build_command = req =>
+        reader.build_command_curl(
+          state.env,
+          reader.full_url_request(URLSearchParams, state.env, req),
+          { arg_separator: config.arg_separator }
+        );
+      commands = map(build_command, requests);
+      break;
+    }
+    case 'httpie': {
+      let build_command = req =>
+        reader.build_command_httpie(state.env, req, {
+          arg_separator: config.arg_separator
+        });
+      commands = map(build_command, requests);
+      break;
+    }
+    case 'wget': {
+      let build_command = req =>
+        reader.build_command_wget(
+          URLSearchParams,
+          state.env,
+          reader.full_url_request(URLSearchParams, state.env, req),
+          { arg_separator: config.arg_separator }
+        );
+      commands = map(build_command, requests);
+      break;
+    }
+    default:
+      return Result.Err({
+        message: `invalid parameter ${config.syntax}`,
+        info: 'The supported parameters are "curl", "httpie" and "wget"'
+      });
+  }
+
+  return commands.join('\n\n');
+}
+
 module.exports = {
   run: {
     all: run_all,
     collection: run_collection,
     interactive: run_interactive
   },
-  help: bind(log_effect, true, help),
-  version: bind(log_effect, true, version),
-  list: (...args) => log_effect(true, list, ...args)
+  help: show(help),
+  version: show(version),
+  list: show(list),
+  convert_to: show(convert_to)
 };

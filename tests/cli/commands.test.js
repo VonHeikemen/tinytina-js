@@ -4,7 +4,7 @@ const { Form } = require('enquirer');
 
 const { is_empty, bind } = require('../../src/common/utils');
 const { parse_query } = require('../../src/cli/utils');
-const { run, list } = require('../../src/cli/commands');
+const { run, list, convert_to } = require('../../src/cli/commands');
 const version = require('../../src/cli/version');
 const { command_context } = require('./helpers');
 
@@ -264,4 +264,109 @@ test('render list of requests paths', function() {
 
   const result = effect({ log: stub });
   t.equal(result, expected.join('\n'), 'list of requests path');
+});
+
+suite('# cli - convert-to command');
+
+test('render a list of "curl" commands', function() {
+  const separator = ' \\\n';
+  const join = arr => arr.join(separator);
+  const expected = [
+    [
+      'curl --request POST',
+      '--header "Authorization: {api-key}"',
+      '--form "name=some test value"',
+      '--form "lastname=body-ish"',
+      '--form "email=not-real-deal"',
+      '--form "code=no-one-should-see-me"',
+      '--form "image=@/tmp/yourface.jpg"',
+      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    ],
+    [
+      'curl --request POST',
+      '--header "Authorization: {api-key}"',
+      '--header "Content-Type: application/json"',
+      `--data '{
+  "name": "some test value",
+  "lastname": "body",
+  "email": "not-real-deal",
+  "code": {
+    "payload": "no-one-should-see-me"
+  }
+}'`,
+      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    ]
+  ];
+
+  const command = create_command('convert-to', 'short-id:also-short,json-data');
+  command.config = { syntax: 'curl', arg_separator: separator };
+
+  const effect = convert_to(reader, create_state(), command).cata(
+    identity,
+    constant
+  );
+
+  const result = effect({ log: stub });
+  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
+});
+
+test('render a list of "httpie" commands', function() {
+  const separator = ' \\\n';
+  const join = arr => arr.join(separator);
+  const expected = [
+    [
+      'http --form POST "http://localhost:3000/service/register"',
+      'Authorization:"{api-key}"',
+      'stuff=="this goes in the URL as a querystring"',
+      'name="some test value"',
+      'lastname="body-ish"',
+      'email="not-real-deal"',
+      'code="no-one-should-see-me"',
+      'image@/tmp/yourface.jpg'
+    ],
+    [
+      'http --json POST "http://localhost:3000/service/register"',
+      'Authorization:"{api-key}"',
+      'stuff=="this goes in the URL as a querystring"',
+      'name="some test value"',
+      'lastname="body"',
+      'email="not-real-deal"',
+      `code:='{"payload":"no-one-should-see-me"}'`
+    ]
+  ];
+
+  const command = create_command('convert-to', 'short-id:also-short,json-data');
+  command.config = { syntax: 'httpie', arg_separator: separator };
+
+  const effect = convert_to(reader, create_state(), command).cata(
+    identity,
+    constant
+  );
+
+  const result = effect({ log: stub });
+  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
+});
+
+test('render a list of "wget" commands', function() {
+  const separator = ' \\\n';
+  const join = arr => arr.join(separator);
+  const expected = [
+    [
+      'wget --method POST',
+      '--header "Authorization: {api-key}"',
+      '--body-data "name=some+test+value&lastname=body-ish&email=not-real-deal&code=no-one-should-see-me"',
+      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    ]
+  ];
+
+  const command = create_command('convert-to', 'short-id:also-short');
+  command.config = { syntax: 'wget', arg_separator: separator };
+
+  const effect = convert_to(reader, create_state(), command).cata(
+    identity,
+    constant
+  );
+
+  const result = effect({ log: stub });
+  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
 });

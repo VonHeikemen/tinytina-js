@@ -3,7 +3,7 @@
 const jsonfile = require('jsonfile');
 
 const { prompt, next_action } = require('./cli/interactive');
-const { run, help, version, list } = require('./cli/commands.js');
+const { run, help, version, list, convert_to } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
 const { http, log, pretty_err } = require('./cli/effects');
 const { create_reader } = require('./common/reader');
@@ -63,6 +63,9 @@ async function main({
     case 'run-all':
       state = await create_state();
       return run.all(reader, state, command.config);
+    case 'convert-to':
+      state = await create_state();
+      return convert_to(reader, state, command);
   }
 }
 

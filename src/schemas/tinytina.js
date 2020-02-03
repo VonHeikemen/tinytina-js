@@ -13,6 +13,67 @@ const {
   what_is
 } = require('../common/utils');
 
+function escape_double_quotes(str) {
+  return str.replace(/"/g, '\\"');
+}
+
+function valid_post_type(type) {
+  return ['urlencoded', 'json', 'form'].includes(type);
+}
+
+function get_method(request) {
+  let method = request.method;
+
+  if (is_empty(method)) {
+    switch (true) {
+      case !is_nil(request.files):
+      case !is_nil(request.data):
+        method = 'POST';
+        break;
+      default:
+        method = 'GET';
+        break;
+    }
+  }
+
+  return method.toUpperCase();
+}
+
+function get_post_type(request) {
+  let type = valid_post_type(request.type) ? request.type : 'urlencoded';
+
+  if (what_is(request.data) == '[object Object]') {
+    type = 'json';
+  } else if (request.files && type == 'urlencoded') {
+    type = 'form';
+  }
+
+  return type;
+}
+
+function full_url_request(URLSearchParams, env, request) {
+  const parse = expand(env);
+
+  let url = request.url;
+  let form = new URLSearchParams();
+
+  if (is_empty(request.query)) {
+    return request;
+  }
+
+  for (let param of request.query) {
+    form.append(param.name, parse(param.value));
+  }
+
+  url += url.includes('?') ? form.toString() : `?${form.toString()}`;
+
+  return {
+    ...request,
+    query: [],
+    url
+  };
+}
+
 function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
   let state = init_state();
 
@@ -128,10 +189,6 @@ function get_requests(collections, query) {
   return result.catchmap(append_err);
 }
 
-function valid_post_type(type) {
-  return ['urlencoded', 'json', 'form'].includes(type);
-}
-
 function build_fetch_options(env, request) {
   const parse = expand(env);
   const parse_form = function(state, input) {
@@ -147,9 +204,7 @@ function build_fetch_options(env, request) {
   result.opts.headers = expand_data(request.headers);
   result.query = expand_data(request.query);
 
-  result.opts.method = is_empty(request.method)
-    ? 'GET'
-    : request.method.toUpperCase();
+  result.opts.method = get_method(request);
 
   let output_path = get_or(false, 'output.path', request);
   if (output_path) {
@@ -163,13 +218,7 @@ function build_fetch_options(env, request) {
   }
 
   result.files = expand_data(request.files);
-  result.type = valid_post_type(request.type) ? request.type : 'urlencoded';
-
-  if (what_is(request.data) == '[object Object]') {
-    result.type = 'json';
-  } else if (request.files && result.type == 'urlencoded') {
-    result.type = 'form';
-  }
+  result.type = get_post_type(request);
 
   if (result.type == 'json') {
     result.body = parse(request.data);
@@ -297,19 +346,7 @@ function build_prompt_options(state, form_to_request, request) {
       break;
   }
 
-  let method = request.method;
-
-  if (is_empty(method)) {
-    switch (true) {
-      case !is_nil(request.files):
-      case !is_nil(request.data):
-        method = 'POST';
-        break;
-      default:
-        method = 'GET';
-        break;
-    }
-  }
+  let method = get_method(request);
 
   if (method != 'GET' && what_is(request.data) == '[object Object]') {
     return { error: "Can't render form. 'data' needs to be an array" };
@@ -365,13 +402,166 @@ function build_prompt_options(state, form_to_request, request) {
   return opts;
 }
 
+function build_command_curl(env, request, { arg_separator }) {
+  const parse = expand(env);
+  const safe_parse = pipe(parse, escape_double_quotes);
+  const type = get_post_type(request);
+
+  let result = [`curl --request ${get_method(request)}`];
+  const header = ({ name, value }) =>
+    `--header "${name}: ${safe_parse(value)}"`;
+  const form_data = ({ name, value }) =>
+    `--form "${name}=${safe_parse(value)}"`;
+  const form_file = ({ name, value }) =>
+    `--form "${name}=@${safe_parse(value)}"`;
+  const form_urlencoded = ({ name, value }) =>
+    `--data "${name}=${safe_parse(value)}"`;
+
+  if (!is_empty(request.headers)) {
+    result.push(...map(header, request.headers));
+  }
+
+  if (!is_empty(request.data)) {
+    switch (type) {
+      case 'form':
+        result.push(...map(form_data, request.data));
+        break;
+      case 'urlencoded':
+        result.push(...map(form_urlencoded, request.data));
+        break;
+      case 'json':
+        const content_type = (request.headers || []).find(header =>
+          header.value.toLowerCase().includes('content-type: application/json')
+        );
+        if (is_empty(content_type)) {
+          result.push('--header "Content-Type: application/json"');
+        }
+
+        result.push(`--data '${JSON.stringify(parse(request.data), null, 2)}'`);
+        break;
+    }
+  }
+
+  if (!is_empty(request.files) && type == 'form') {
+    result.push(...map(form_file, request.files));
+  }
+
+  result.push(`"${parse(request.url)}"`);
+
+  return result.join(arg_separator);
+}
+
+function build_command_httpie(env, request, { arg_separator }) {
+  const parse = expand(env);
+  const safe_parse = pipe(parse, escape_double_quotes);
+  const method = get_method(request);
+  const type = get_post_type(request);
+
+  let result = [];
+
+  switch (type) {
+    case 'form':
+      result.push(`http --form ${method} "${parse(request.url)}"`);
+      break;
+    case 'json':
+      result.push(`http --json ${method} "${parse(request.url)}"`);
+      break;
+    case 'urlencoded':
+    default:
+      result.push(`http ${method} "${parse(request.url)}"`);
+      break;
+  }
+
+  if (!is_empty(request.headers)) {
+    const header = ({ name, value }) => `${name}:"${safe_parse(value)}"`;
+    result.push(...map(header, request.headers));
+  }
+
+  if (!is_empty(request.query)) {
+    const query_data = ({ name, value }) => `${name}=="${safe_parse(value)}"`;
+    result.push(...map(query_data, request.query));
+  }
+
+  if (!is_empty(request.data)) {
+    switch (type) {
+      case 'form':
+        const form_data = ({ name, value }) => `${name}="${safe_parse(value)}"`;
+        result.push(...map(form_data, request.data));
+        break;
+      case 'urlencoded':
+        const form_urlencoded = ({ name, value }) =>
+          `${name}="${safe_parse(value)}"`;
+        result.push(...map(form_urlencoded, request.data));
+        break;
+      case 'json':
+        for (let [name, value] of Object.entries(request.data)) {
+          switch (what_is(value)) {
+            case '[object Object]':
+            case '[object Array]':
+              result.push(`${name}:='${JSON.stringify(parse(value))}'`);
+              break;
+            case '[object Undefined]':
+            case '[object Null]':
+            case '[object Number]':
+              result.push(`${name}:="${value}"`);
+              break;
+            default:
+              result.push(`${name}="${safe_parse(value)}"`);
+              break;
+          }
+        }
+        break;
+    }
+  }
+
+  if (!is_empty(request.files) && type == 'form') {
+    const form_file = ({ name, value }) => `${name}@${parse(value)}`;
+    result.push(...map(form_file, request.files));
+  }
+
+  return result.join(arg_separator);
+}
+
+function build_command_wget(URLSearchParams, env, request, { arg_separator }) {
+  const parse = expand(env);
+  const safe_parse = pipe(parse, escape_double_quotes);
+  const type = get_post_type(request);
+
+  let result = [`wget --method ${get_method(request)}`];
+
+  if (!is_empty(request.headers)) {
+    const header = ({ name, value }) =>
+      `--header "${name}: ${safe_parse(value)}"`;
+    result.push(...map(header, request.headers));
+  }
+
+  if (!is_empty(request.data)) {
+    const data = new URLSearchParams();
+    for (let param of request.data) {
+      what_is(param.value) == '[object Object]'
+        ? data.append(param.name, JSON.stringify(parse(param.value)))
+        : data.append(param.name, parse(param.value));
+    }
+
+    result.push(`--body-data "${data.toString()}"`);
+  }
+
+  result.push(`"${parse(request.url)}"`);
+
+  return result.join(arg_separator);
+}
+
 module.exports = {
   create_state,
+  full_url_request,
   build_fetch_options,
   get_requests,
   get_all_requests,
   get_collection,
   build_prompt_options,
   list_requests,
-  list_to_string
+  list_to_string,
+  build_command_curl,
+  build_command_httpie,
+  build_command_wget
 };
