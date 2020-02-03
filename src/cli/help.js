@@ -9,6 +9,7 @@ module.exports = function help() {
       tinytina list [arg]
       tinytina [OPTIONS] run [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] run-all 
+      tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]
 
   COMMANDS
       run:
@@ -23,6 +24,10 @@ module.exports = function help() {
           It shows a list with the metadata of the requests in the schema. If 'path' is provided as a first 
           argument it will show a list of valid path that you can use with the run command.
 
+      convert-to:
+          It transforms a request query or a list of queries into a shell commands and prints it to the screen. 
+          Currently supports "curl", "httpie" and "wget" commands.
+
   OPTIONS
       -h, --help                          Shows this help message
       -v, --version                       Displays the current version of tinytina
@@ -34,6 +39,7 @@ module.exports = function help() {
       -i, --interactive                   It presents a "form" with the requests params before running it
       -p, --request-prop                  Change the search criteria ("id" by default) to another property
       -r, --raw-response                  Disable the colors and format of the response body
+      --arg-separator                     Set the delimeter between arguments in the commands shown by 'convert-to'
 
   SCHEMA STRUCTURE
       A schema is a json file that contains all the data necesary to execute a request as well information about
@@ -113,5 +119,11 @@ module.exports = function help() {
 
       List only the paths to the requests in the schema:
           tinytina --schema ./example.json list path
+
+      Show a request as a curl command:
+          tinytina --schema ./example.json convert-to curl auth:login
+
+      Show multiple requests as curl commands and change argument delimeter to a newline (bash):
+          tinytina --schema ./example.json --arg-separator $'\n' convert-to curl auth:login,logout
 `;
 };

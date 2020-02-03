@@ -56,6 +56,9 @@ Executes every requests in the json schema.
 #### `tinytina [OPTIONS] list [arg]`
 It shows a list with the metadata of the requests in the schema. If 'path' is provided as a first argument it will show a list of valid path that you can use with the `run` command.
 
+#### `tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]`
+It transforms a request query or a list of queries into a shell commands and prints it to the screen. Currently supports "curl", "httpie" and "wget" commands.
+
 ### Command Line Options
 - `-h`, `--help`<br/>
   Shows usage information.
@@ -86,6 +89,9 @@ It shows a list with the metadata of the requests in the schema. If 'path' is pr
 
 - `-r`, `--raw-response`<br/>
   Disable the colors and format of the response body.
+
+- `--arg-separator`
+Set the delimeter between arguments in the commands shown by 'convert-to.'
 
 ### Examples
 Assuming you downloaded the release version and made it executable with the name tinytina.
@@ -138,6 +144,15 @@ List the data of all the requests in the schema
 List only the paths to the requests in the schema
 ```
  tinytina --schema ./example.json list path
+```
+Show a request as a curl command
+```
+ tinytina --schema ./example.json convert-to curl auth:login
+```
+
+Show multiple requests as curl commands and change the argument delimeter to a newline (bash):
+```
+ tinytina --schema ./example.json --arg-separator $'\n' convert-to curl auth:login,logout
 ```
 
 ### JSON Schema Structure
