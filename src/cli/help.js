@@ -30,7 +30,7 @@ module.exports = function help() {
           Currently supports "curl", "httpie" and "wget" commands.
 
       markdown, md:
-          Transforms the json schema into a markdown document. Use the option '--example-syntax' to choose the syntax of
+          Show the json schema as a markdown document. Use the option '--example-syntax' to choose the syntax of
           the commands shown as examples and '--arg-separator' to choose the arguments delimeter. 
 
   OPTIONS
