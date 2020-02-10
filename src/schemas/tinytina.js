@@ -42,7 +42,7 @@ function get_method(request) {
 function get_post_type(request) {
   let type = valid_post_type(request.type) ? request.type : 'urlencoded';
 
-  if (what_is(request.data) == '[object Object]') {
+  if (what_is(request.data).object()) {
     type = 'json';
   } else if (request.files && type == 'urlencoded') {
     type = 'form';
@@ -88,6 +88,10 @@ function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
   env.raw = shallow_copy(schema.envs) || {};
   env.extra = extra_vars;
 
+  let new_env = create_env(name, env);
+  state.env = map(expand(new_env), new_env);
+  state.env_name = name;
+
   if (schema.hide) {
     state.hidden_env_vars = schema.hide;
   }
@@ -96,9 +100,8 @@ function create_state(schema, name, { extra_vars = {}, hide_vars = [] } = {}) {
     state.hidden_env_vars = state.hidden_env_vars.concat(hide_vars);
   }
 
-  let new_env = create_env(name, env);
-  state.env = map(expand(new_env), new_env);
-  state.env_name = name;
+  state.name = get_or('', 'name', schema);
+  state.description = get_or('', 'description', schema);
 
   return Result.Ok(state);
 }
@@ -348,7 +351,7 @@ function build_prompt_options(state, form_to_request, request) {
 
   let method = get_method(request);
 
-  if (method != 'GET' && what_is(request.data) == '[object Object]') {
+  if (method != 'GET' && what_is(request.data).object()) {
     return { error: "Can't render form. 'data' needs to be an array" };
   }
 
@@ -495,14 +498,15 @@ function build_command_httpie(env, request, { arg_separator }) {
         break;
       case 'json':
         for (let [name, value] of Object.entries(request.data)) {
-          switch (what_is(value)) {
-            case '[object Object]':
-            case '[object Array]':
+          const is = what_is(value);
+          switch (true) {
+            case is.object():
+            case is.array():
               result.push(`${name}:='${JSON.stringify(parse(value))}'`);
               break;
-            case '[object Undefined]':
-            case '[object Null]':
-            case '[object Number]':
+            case is.undefined():
+            case is.null():
+            case is.number():
               result.push(`${name}:="${value}"`);
               break;
             default:
@@ -538,7 +542,7 @@ function build_command_wget(URLSearchParams, env, request, { arg_separator }) {
   if (!is_empty(request.data)) {
     const data = new URLSearchParams();
     for (let param of request.data) {
-      what_is(param.value) == '[object Object]'
+      what_is(param.value).object()
         ? data.append(param.name, JSON.stringify(parse(param.value)))
         : data.append(param.name, parse(param.value));
     }
@@ -549,6 +553,207 @@ function build_command_wget(URLSearchParams, env, request, { arg_separator }) {
   result.push(`"${parse(request.url)}"`);
 
   return result.join(arg_separator);
+}
+
+function build_shell_command(
+  URLSearchParams,
+  state,
+  { syntax, arg_separator }
+) {
+  switch (syntax) {
+    case 'curl':
+      return Result.Ok(req =>
+        build_command_curl(
+          state.env,
+          full_url_request(URLSearchParams, state.env, req),
+          { arg_separator }
+        )
+      );
+    case 'httpie':
+      return Result.Ok(req =>
+        build_command_httpie(state.env, req, { arg_separator })
+      );
+    case 'wget':
+      return Result.Ok(req =>
+        build_command_wget(
+          URLSearchParams,
+          state.env,
+          full_url_request(URLSearchParams, state.env, req),
+          { arg_separator }
+        )
+      );
+    default:
+      return Result.Err({
+        message: `invalid parameter ${syntax}`,
+        info: 'The supported parameters are "curl", "httpie" and "wget"'
+      });
+  }
+}
+
+function build_doc_markdown(
+  URLSearchParams,
+  state,
+  { syntax, arg_separator, exclude }
+) {
+  const parse = expand(state.env);
+
+  const exclude_query = map(
+    q => ({ ...q, collection: q.collection.join('.') }),
+    exclude
+  );
+
+  const example_cmd = build_shell_command(URLSearchParams, state, {
+    arg_separator,
+    syntax
+  })
+    .map(cmd => request => `\`\`\`\n${cmd(request)}\n\`\`\`\n\n`)
+    .unwrap_or(() => '');
+
+  const heading = num => str => `${'#'.repeat(num)} ${str}\n`;
+  const h2 = heading(2);
+  const h3 = heading(3);
+  const h4 = heading(4);
+
+  const join_lines = str => (Array.isArray(str) ? str.join('\n') : str);
+  const multiline = str => `\n${join_lines(str)}\n\n`;
+
+  const get_extra_headers = function(data) {
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    let headers = new Set();
+
+    for (const param of data) {
+      Object.keys(param.metadata || {}).forEach(k => headers.add(k));
+    }
+
+    return Array.from(headers);
+  };
+
+  const create_table = function(data) {
+    let headers = get_extra_headers(data);
+    let body = '\n| ';
+
+    const cell = str => ` ${is_nil(str) ? '' : str} |`;
+
+    body += cell('Field');
+    body += cell('Value');
+
+    for (const h of headers) {
+      body += cell(h);
+    }
+
+    body += '\n|';
+
+    body += cell('---');
+    body += cell('---');
+
+    for (const h of headers) {
+      body += cell('---');
+    }
+
+    body += '\n';
+
+    for (const param of data) {
+      body += '|';
+
+      body += cell(param.name);
+      body += cell(parse(param.value));
+
+      if (!is_empty(headers)) {
+        for (const h of headers) {
+          body += cell(get_or('', ['metadata', h], param));
+        }
+      }
+
+      body += '\n';
+    }
+
+    return body + '\n';
+  };
+
+  const collection_to_markdown = function(path, collections) {
+    let body = '';
+    for (const collection of collections) {
+      const current_path = path + collection.id;
+      let filter = exclude_query.find(q => q.collection == current_path);
+
+      if (is_nil(filter)) {
+        filter = { requests: [], request_prop: 'id' };
+      } else if (is_empty(filter.requests)) {
+        continue;
+      }
+
+      body += h2(collection.name || collection.id);
+
+      if (collection.description) {
+        body += multiline(collection.description);
+      }
+
+      for (const request of collection.requests) {
+        if (filter.requests.includes(request.id)) {
+          continue;
+        }
+
+        body += h3(request.name || request.id || '-');
+
+        if (request.description) {
+          body += multiline(request.description);
+        }
+
+        if (request.headers) {
+          body += h4('Headers');
+          body += create_table(request.headers);
+        }
+
+        if (request.query) {
+          body += h4('Query String');
+          body += create_table(request.query);
+        }
+
+        if (is_empty(request.data) && request.files) {
+          body += h4('Data');
+          body += create_table(request.files);
+        } else if (Array.isArray(request.data)) {
+          body += h4('Data');
+          let data = is_empty(request.files)
+            ? request.data
+            : request.data.concat(request.files);
+
+          body += create_table(data);
+        } else if (Array.isArray(request['data-description'])) {
+          body += h4('Data');
+          body += create_table(request['data-description']);
+        }
+
+        body += example_cmd(request);
+      }
+
+      if (!is_empty(collection.collections)) {
+        body += collection_to_markdown(
+          `${current_path}.`,
+          collection.collections
+        );
+      }
+    }
+
+    return body;
+  };
+
+  let docs = '';
+
+  if (state.name) {
+    docs += `# ${state.name}\n`;
+  }
+
+  if (state.description) {
+    docs += multiline(state.description);
+  }
+
+  docs += collection_to_markdown('', state.collection);
+
+  return docs;
 }
 
 module.exports = {
@@ -563,5 +768,7 @@ module.exports = {
   list_to_string,
   build_command_curl,
   build_command_httpie,
-  build_command_wget
+  build_command_wget,
+  build_shell_command,
+  build_doc_markdown
 };

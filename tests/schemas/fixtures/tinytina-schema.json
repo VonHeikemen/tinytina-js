@@ -1,4 +1,11 @@
 {
+  "name": "Name of the schema",
+  "description": [
+    "Some multiline description about stuff", 
+    "Look, another line", 
+    "",
+    "things..."
+  ],
   "hide": ["api-key"],
   "globals": {
     "secret-thing": "no-one-should-see-me",
@@ -32,13 +39,29 @@
           "url": "{host}/service/register",
           "method": "POST",
           "headers": [
-            { "name": "Authorization", "value": "{api-key}" }
+            { "name": "Authorization", "value": "{api-key}", "metadata": {
+              "Type": "String",
+              "Required": "Yes"
+            } }
           ],
           "data": [
-            { "name": "name", "value": "some test value" },
-            { "name": "lastname", "value": "{lastname}-ish" },
-            { "name": "email", "value": "{email}" },
-            { "name": "code", "value": "{secret-thing}" }
+            { "name": "name", "value": "some test value", "metadata": {
+              "Type": "String",
+              "Required": "Yes"
+            } },
+            { "name": "lastname", "value": "{lastname}-ish", "metadata": {
+              "Type": "String",
+              "Required": "No"
+            } },
+            { "name": "email", "value": "{email}", "metadata": {
+              "Type": "String",
+              "Required": "Maybe"
+            } },
+            { "name": "code", "value": "{secret-thing}", "metadata": {
+              "Type": "String",
+              "Arbitrary Column": "A description of whatever",
+              "Required": "Yes"
+            } }
           ],
           "query": [
             { "name": "stuff", "value": "this goes in the URL as a querystring" }
@@ -53,6 +76,13 @@
           "method": "POST",
           "headers": [
             { "name": "Authorization", "value": "{api-key}" }
+          ],
+          "data-description": [
+            { "name": "name", "value": "some name" },
+            { "name": "lastname", "value": "a last name" },
+            { "name": "email", "value": "this better be an email" },
+            { "name": "code", "value": "an object with a secret thing" },
+            { "name": "code.payload", "value": "the secret thing" }
           ],
           "data": {
             "name": "some test value",

@@ -29,6 +29,8 @@ function process_args(process_argv) {
     var args = arg(process_argv, {
       '--arg-separator': String,
       '--env': String,
+      '--example-syntax': String,
+      '--exclude': String,
       '--global': [String],
       '--hide': [String],
       '--interactive': Boolean,
@@ -95,11 +97,25 @@ function process_args(process_argv) {
     }
     case 'convert-to': {
       const parse = bind(parse_query, get_or('id', '--request-prop', args));
-      opts.command.config = {
-        syntax: argv[1],
-        arg_separator: get_or(' ', '--arg-separator', args)
-      };
       opts.command.args = map(parse, argv.slice(2));
+      opts.command.config = {
+        arg_separator: get_or(' ', '--arg-separator', args),
+        syntax: argv[1]
+      };
+      break;
+    }
+    case 'markdown':
+    case 'md': {
+      const parse = bind(
+        map,
+        bind(parse_query, get_or('id', '--request-prop', args))
+      );
+      opts.command.name = 'markdown';
+      opts.command.config = {
+        arg_separator: get_or('\n', '--arg-separator', args),
+        exclude: parse(get_or('', '--exclude', args).split(' ')),
+        syntax: get_or('curl', '--example-syntax', args)
+      };
       break;
     }
     default:

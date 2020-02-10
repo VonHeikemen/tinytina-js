@@ -4,9 +4,11 @@ const { Form } = require('enquirer');
 
 const { is_empty, bind } = require('../../src/common/utils');
 const { parse_query } = require('../../src/cli/utils');
-const { run, list, convert_to } = require('../../src/cli/commands');
+const { run, list, convert_to, doc } = require('../../src/cli/commands');
 const version = require('../../src/cli/version');
 const { command_context } = require('./helpers');
+
+const expected = require('../schemas/fixtures/expected-data');
 
 const { reader, create_state, create_command } = command_context();
 
@@ -234,7 +236,7 @@ test('runs all requests in the schema', function() {
 
   const requests = effect({ http: stub });
 
-  t.equal(requests.length, 8, 'got all requests');
+  t.equal(requests.length, expected.schema_request_count, 'got all requests');
 });
 
 suite('# cli - version command');
@@ -249,21 +251,11 @@ test('version is in sync with package.json', function() {
 suite('# cli - list command');
 
 test('render list of requests paths', function() {
-  const expected = [
-    '',
-    'short-id:also-short',
-    'short-id:json-data',
-    'short-id.oh-look:download-face',
-    'short-id.oh-look:guess-filename',
-    'short-id.oh-look.3rd-level:lonely-get',
-    'another:has-id'
-  ];
-
   const command = { name: 'list', args: ['path'] };
   const effect = list(reader, create_state(), command).cata(identity, constant);
 
   const result = effect({ log: stub });
-  t.equal(result, expected.join('\n'), 'list of requests path');
+  t.equal(result, expected.valid_paths.join('\n'), 'list of requests path');
 });
 
 suite('# cli - convert-to command');
@@ -271,32 +263,6 @@ suite('# cli - convert-to command');
 test('render a list of "curl" commands', function() {
   const separator = ' \\\n';
   const join = arr => arr.join(separator);
-  const expected = [
-    [
-      'curl --request POST',
-      '--header "Authorization: {api-key}"',
-      '--form "name=some test value"',
-      '--form "lastname=body-ish"',
-      '--form "email=not-real-deal"',
-      '--form "code=no-one-should-see-me"',
-      '--form "image=@/tmp/yourface.jpg"',
-      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
-    ],
-    [
-      'curl --request POST',
-      '--header "Authorization: {api-key}"',
-      '--header "Content-Type: application/json"',
-      `--data '{
-  "name": "some test value",
-  "lastname": "body",
-  "email": "not-real-deal",
-  "code": {
-    "payload": "no-one-should-see-me"
-  }
-}'`,
-      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
-    ]
-  ];
 
   const command = create_command('convert-to', 'short-id:also-short,json-data');
   command.config = { syntax: 'curl', arg_separator: separator };
@@ -307,33 +273,16 @@ test('render a list of "curl" commands', function() {
   );
 
   const result = effect({ log: stub });
-  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
+  t.equal(
+    result,
+    expected.curl_commands.flatMap(join).join('\n\n'),
+    'list of curl commands'
+  );
 });
 
 test('render a list of "httpie" commands', function() {
   const separator = ' \\\n';
   const join = arr => arr.join(separator);
-  const expected = [
-    [
-      'http --form POST "http://localhost:3000/service/register"',
-      'Authorization:"{api-key}"',
-      'stuff=="this goes in the URL as a querystring"',
-      'name="some test value"',
-      'lastname="body-ish"',
-      'email="not-real-deal"',
-      'code="no-one-should-see-me"',
-      'image@/tmp/yourface.jpg'
-    ],
-    [
-      'http --json POST "http://localhost:3000/service/register"',
-      'Authorization:"{api-key}"',
-      'stuff=="this goes in the URL as a querystring"',
-      'name="some test value"',
-      'lastname="body"',
-      'email="not-real-deal"',
-      `code:='{"payload":"no-one-should-see-me"}'`
-    ]
-  ];
 
   const command = create_command('convert-to', 'short-id:also-short,json-data');
   command.config = { syntax: 'httpie', arg_separator: separator };
@@ -344,20 +293,16 @@ test('render a list of "httpie" commands', function() {
   );
 
   const result = effect({ log: stub });
-  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
+  t.equal(
+    result,
+    expected.httpie_commands.flatMap(join).join('\n\n'),
+    'list of httpie commands'
+  );
 });
 
 test('render a list of "wget" commands', function() {
   const separator = ' \\\n';
   const join = arr => arr.join(separator);
-  const expected = [
-    [
-      'wget --method POST',
-      '--header "Authorization: {api-key}"',
-      '--body-data "name=some+test+value&lastname=body-ish&email=not-real-deal&code=no-one-should-see-me"',
-      '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
-    ]
-  ];
 
   const command = create_command('convert-to', 'short-id:also-short');
   command.config = { syntax: 'wget', arg_separator: separator };
@@ -368,5 +313,25 @@ test('render a list of "wget" commands', function() {
   );
 
   const result = effect({ log: stub });
-  t.equal(result, expected.flatMap(join).join('\n\n'), 'list of curl commands');
+  t.equal(
+    result,
+    expected.wget_commands.flatMap(join).join('\n\n'),
+    'list of wget commands'
+  );
+});
+
+suite('# cli - markdown command');
+
+test('render a "markdown" document', function() {
+  const command = create_command('md');
+  command.config = {
+    syntax: 'curl',
+    arg_separator: '\n',
+    exclude: [parse_query('id', 'another:has-id')]
+  };
+
+  const effect = doc(reader, create_state(), command).cata(identity, constant);
+
+  const result = effect({ log: stub });
+  t.equal(result, expected.markdown, 'a markdown document');
 });

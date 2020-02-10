@@ -15,7 +15,18 @@ function is_empty(arg) {
 }
 
 function what_is(arg) {
-  return Object.prototype.toString.call(arg);
+  const is = Object.prototype.toString.call(arg);
+
+  return {
+    val: () => is,
+    object: () => is == '[object Object]',
+    array: () => is == '[object Array]',
+    promise: () => is == '[object Promise]',
+    undefined: () => is == '[object Undefined]',
+    null: () => is == '[object Null]',
+    number: () => is == '[object Number]',
+    func: () => is == '[object Function]'
+  };
 }
 
 function map(fn, arg) {
@@ -29,7 +40,7 @@ function map(fn, arg) {
 
   let is = what_is(arg);
 
-  if (is === '[object Object]') {
+  if (is.object()) {
     let res = {};
     for (let key in arg) {
       res[key] = fn(arg[key], key);
@@ -38,7 +49,7 @@ function map(fn, arg) {
     return res;
   }
 
-  if (is === '[object Promise]') {
+  if (is.promise()) {
     return arg.then(fn);
   }
 }
@@ -54,7 +65,7 @@ function filter(fn, arg) {
 
   let is = what_is(arg);
 
-  if (is === '[object Object]') {
+  if (is.object()) {
     let res = {};
     for (let key in arg) {
       if (fn(arg[key], key)) {
@@ -65,7 +76,7 @@ function filter(fn, arg) {
     return res;
   }
 
-  if (is === '[object Promise]') {
+  if (is.promise()) {
     return arg.then(val => (fn(val) ? val : Promise.reject(val)));
   }
 }
@@ -81,7 +92,7 @@ function reduce(fn, init, arg) {
 
   let is = what_is(arg);
 
-  if (is === '[object Object]') {
+  if (is.object()) {
     let state = init;
     for (let key in arg) {
       state = fn(state, arg[key], key, arg);

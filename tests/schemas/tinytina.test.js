@@ -69,7 +69,11 @@ test('get all requests from a collection', function() {
   const requests = reader.get_all_requests(state.collection);
 
   t.ok(requests.length, 'requests is not empty');
-  t.equal(requests.length, 8, 'got all requests in the schema');
+  t.equal(
+    requests.length,
+    expected.schema_request_count,
+    'got all requests in the schema'
+  );
 });
 
 test('transform request from schema to a fetch options object', function() {
@@ -135,7 +139,7 @@ test('transform request from schema to a prompt options object', function() {
 });
 
 test('get flatten list of requests metadata', function() {
-  const expected = {
+  const expected_data = {
     name: 'deeply nested',
     description: 'A nested request',
     id: 'lonely-get',
@@ -153,8 +157,12 @@ test('get flatten list of requests metadata', function() {
   const requests = reader.list_requests(state.collection);
 
   t.ok(requests.length, 'requests is not empty');
-  t.equal(requests.length, 8, 'got all requests in the schema');
-  t.deepEqual(requests[4], expected, 'got expected metadata');
+  t.equal(
+    requests.length,
+    expected.schema_request_count,
+    'got all requests in the schema'
+  );
+  t.deepEqual(requests[4], expected_data, 'got expected metadata');
 });
 
 test('transform metadata list to a string', function() {

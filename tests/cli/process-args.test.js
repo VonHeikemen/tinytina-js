@@ -138,6 +138,26 @@ test('gather arguments for "convert-to" command', function() {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
+test('gather arguments for "markdown" command', function() {
+  const expected = {
+    ...fake_args('markdown'),
+    command: {
+      name: 'markdown',
+      config: {
+        syntax: 'curl',
+        arg_separator: '\n',
+        exclude: [parse_query('id', 'another:has-id')]
+      }
+    }
+  };
+
+  const result = process_args(
+    cli_input(['--exclude', 'another:has-id', 'markdown'])
+  );
+
+  t.deepEqual(result, expected, 'arguments object has the right shape');
+});
+
 test('return error when --schema is missing', function() {
   const expected = {
     err: { message: 'must provide --schema with a path to a json file' }

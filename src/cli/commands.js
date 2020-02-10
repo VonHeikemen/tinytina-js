@@ -12,7 +12,7 @@ function show(fn) {
   return (...args) => log_effect(true, fn, ...args);
 }
 
-function safe_show(fn) {
+function show_result(fn) {
   return (...args) => {
     const result = fn.apply(fn, args);
 
@@ -112,53 +112,17 @@ function list(reader, state, { args }) {
 function convert_to(reader, state, { args, config }) {
   const result = is_empty(args)
     ? Result.Ok(reader.get_all_requests(state.collection))
-    : search_requests(reader, state, args);
+    : search_requests(reader, state, args).map(reqs => reqs.flat());
 
-  if (result.is_err) {
-    return result;
-  }
+  const build_command = reader
+    .build_shell_command(URLSearchParams, state, config)
+    .map(fn => bind(map, fn));
 
-  let commands = '';
-  const requests = result.unwrap_or([]).flat();
+  return result.ap(build_command).map(arr => arr.join('\n\n'));
+}
 
-  switch (config.syntax) {
-    case 'curl': {
-      let build_command = req =>
-        reader.build_command_curl(
-          state.env,
-          reader.full_url_request(URLSearchParams, state.env, req),
-          { arg_separator: config.arg_separator }
-        );
-      commands = map(build_command, requests);
-      break;
-    }
-    case 'httpie': {
-      let build_command = req =>
-        reader.build_command_httpie(state.env, req, {
-          arg_separator: config.arg_separator
-        });
-      commands = map(build_command, requests);
-      break;
-    }
-    case 'wget': {
-      let build_command = req =>
-        reader.build_command_wget(
-          URLSearchParams,
-          state.env,
-          reader.full_url_request(URLSearchParams, state.env, req),
-          { arg_separator: config.arg_separator }
-        );
-      commands = map(build_command, requests);
-      break;
-    }
-    default:
-      return Result.Err({
-        message: `invalid parameter ${config.syntax}`,
-        info: 'The supported parameters are "curl", "httpie" and "wget"'
-      });
-  }
-
-  return Result.Ok(commands.join('\n\n'));
+function doc(reader, state, { config }) {
+  return reader.build_doc_markdown(URLSearchParams, state, config);
 }
 
 module.exports = {
@@ -170,5 +134,6 @@ module.exports = {
   help: show(help),
   version: show(version),
   list: show(list),
-  convert_to: safe_show(convert_to)
+  convert_to: show_result(convert_to),
+  doc: show(doc)
 };
