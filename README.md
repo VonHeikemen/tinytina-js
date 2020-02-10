@@ -59,6 +59,9 @@ It shows a list with the metadata of the requests in the schema. If 'path' is pr
 #### `tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]`
 It transforms a request query or a list of queries into a shell commands and prints it to the screen. Currently supports "curl", "httpie" and "wget" commands.
 
+#### `tinytina [OPTIONS] markdown`
+Shows the json schema as a markdown document. Use the option '--example-syntax' to choose the commands shown as examples and '--arg-separator' to choose the arguments delimeter.
+
 ### Command Line Options
 - `-h`, `--help`<br/>
   Shows usage information.
@@ -92,6 +95,12 @@ It transforms a request query or a list of queries into a shell commands and pri
 
 - `--arg-separator`<br />
 Set the delimeter between arguments in the commands shown by 'convert-to.'
+
+- `--example-syntax`<br />
+Set the example commands shown by the 'markdown' command.
+
+- `--exclude`<br />
+Exclude a collection or a request shown by the 'markdown' command.
 
 ### Examples
 Assuming you downloaded the release version and made it executable with the name tinytina.
@@ -153,6 +162,21 @@ Show a request as a curl command
 Show multiple requests as curl commands and change the argument delimeter to a newline (bash):
 ```
  tinytina --schema ./example.json --arg-separator $'\n' convert-to curl auth:login,logout
+```
+
+Render the schema as markdown document:
+```
+tinytina --schema ./example.json --env dev markdown
+```
+
+Exclude the collection 'user' and the request 'login' from the markdown:
+```
+tinytina --schema ./example.json --exclude "user auth:login" markdown
+```
+
+Choose a httpie as syntax for the commands shown in the markdown document (bash):
+```
+tinytina --schema ./example.json --example-syntax httpie --arg-separator $' \\\n' markdown
 ```
 
 ### JSON Schema Structure

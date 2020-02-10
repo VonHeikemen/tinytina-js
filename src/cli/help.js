@@ -10,6 +10,7 @@ module.exports = function help() {
       tinytina [OPTIONS] run [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] run-all 
       tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]
+      tinytina [OPTIONS] markdown
 
   COMMANDS
       run:
@@ -28,6 +29,11 @@ module.exports = function help() {
           It transforms a request query or a list of queries into a shell commands and prints it to the screen. 
           Currently supports "curl", "httpie" and "wget" commands.
 
+      markdown, md:
+          Transforms the json schema into a markdown document. Use the option '--example-syntax' to choose the commands
+          shown as examples and '--arg-separator' to choose the arguments delimeter. 
+          
+
   OPTIONS
       -h, --help                          Shows this help message
       -v, --version                       Displays the current version of tinytina
@@ -39,7 +45,9 @@ module.exports = function help() {
       -i, --interactive                   It presents a "form" with the requests params before running it
       -p, --request-prop                  Change the search criteria ("id" by default) to another property
       -r, --raw-response                  Disable the colors and format of the response body
-      --arg-separator                     Set the delimeter between arguments in the commands shown by 'convert-to'
+      --arg-separator                     Set the delimeter of the shell commands in 'convert-to' and 'markdown'
+      --example-syntax                    Set the example commands shown by the 'markdown' command
+      --exclude                           Exclude a collection or a request shown by the 'markdown' command
 
   SCHEMA STRUCTURE
       A schema is a json file that contains all the data necesary to execute a request as well information about
@@ -125,5 +133,14 @@ module.exports = function help() {
 
       Show multiple requests as curl commands and change argument delimeter to a newline (bash):
           tinytina --schema ./example.json --arg-separator $'\n' convert-to curl auth:login,logout
+
+      Render the schema as markdown document:
+          tinytina --schema ./example.json --env dev markdown
+
+      Exclude the collection 'user' and the request 'login' from the markdown:
+          tinytina --schema ./example.json --exclude "user auth:login" markdown
+
+      Choose a httpie as syntax for the commands shown in the markdown document (bash):
+          tinytina --schema ./example.json --example-syntax httpie --arg-separator $' \\\n' markdown
 `;
 };
