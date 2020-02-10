@@ -200,20 +200,23 @@ A schema is a json file that contains all the data necesary to execute a request
 | `collections` | An array of collection objects. |
 
 #### Request Object
-| Property      | Description   |
-|---------------|---------------|
-| `id`          | A short string to identify the request. |
-| `name`        | A proper name for the requests. |
-| `description` | What the requests does. |
-| `url`         | The route you want to "visit." |
-| `method`      | The http method | 
-| `type`        | It can be `json`, `urlencoded` or `form`. This is used when the method is POST. |
-| `output`      | When present it will try to download the response to a file. It should be an object with the properties "path" and "filename". If "filename" is omitted it will try to guess the name from the response headers. |
-| `headers`     | The http headers. |
-| `query`       | Params to be used as a query string. |
-| `data`        | Params to be used in a POST request. It can be an array of objects with the properties "name" and "value" or a json object. If it is a json object it will be converted to a string and the header 'Content-type' will be set to 'application/json.'|
-| `files`       | A list of files to be uploaded. |
-|               | "headers", "query" and "files" must be arrays of objects these objects must have "name" and "value" properties.
+| Property           | Description   |
+|--------------------|---------------|
+| `id`               | A short string to identify the request. |
+| `name`             | A proper name for the requests. |
+| `description`      | What the requests does. |
+| `url`              | The route you want to "visit." |
+| `method`           | The http method | 
+| `type`             | It can be `json`, `urlencoded` or `form`. This is used when the method is not GET. |
+| `output`           | When present it will try to download the response to a file. It should be an object with the properties "path" and "filename". If "filename" is omitted it will try to guess the name from the response headers. |
+| `headers`          | The http headers. |
+| `query`            | Params to be used as a query string. |
+| `data`             | Params to be used in a POST request. It can be an array of objects with the properties "name" and "value" or a json object. If it is a json object it will be converted to a string and the header 'Content-type' will be set to 'application/json.'|
+| `data-description` | In the case where `data` is an object you can use this property to store the "metadata" of the key-value pairs |
+| `files`            | A list of files to be uploaded. |
+
+#### Parameters
+Properties like "headers", "query", "data" and "files" can be arrays of objects that must have "name" and "value" properties, additionally they can have a "metadata" property which should be an object that holds addiotional data about the parameter, like a description or a type, this object will be used by the 'markdown' command to show the data in a table where the keys become headers and the values columns.
 
 #### Environment variables
 Inside a request object you can use placeholders for a piece of data that can change depending on the context. They can be used in the following properties `url`, `output`, `headers`, `query`, `data` and `files`.
