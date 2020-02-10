@@ -30,9 +30,8 @@ module.exports = function help() {
           Currently supports "curl", "httpie" and "wget" commands.
 
       markdown, md:
-          Transforms the json schema into a markdown document. Use the option '--example-syntax' to choose the commands
-          shown as examples and '--arg-separator' to choose the arguments delimeter. 
-          
+          Transforms the json schema into a markdown document. Use the option '--example-syntax' to choose the syntax of
+          the commands shown as examples and '--arg-separator' to choose the arguments delimeter. 
 
   OPTIONS
       -h, --help                          Shows this help message
@@ -76,7 +75,7 @@ module.exports = function help() {
               - collections": An array of collection objects.
 
           - request object
-            An object with the keys
+          An object with the keys
               - id: A short string to identify the request.
               - name: A proper name for the request.
               - description: What the requests does.
@@ -91,9 +90,14 @@ module.exports = function help() {
               - data: Params to be used in a POST request. It can be an array of objects with the 
                 properties "name" and "value" or a json object. If it is a json object it will be converted to a string
                 and the header 'Content-type' will be set to 'application/json.'
+              - data-description: In the case where data is an object you can use this property to store the "metadata" 
+                of the key-value pairs
               - files: A list of files to be uploaded.
               - "headers", "query" and "files" must be arrays of objects, 
-                 these objects must have "name" and "value" properties
+                 these objects must have "name" and "value" properties.
+                 Additionaly they can have a "metadata" property which 
+                 should be and object that stores additional data that 
+                 will be use by the 'markdown' command to display a table.
 
   EXAMPLES
       Assuming "tinytina" is an executable already in your PATH.
