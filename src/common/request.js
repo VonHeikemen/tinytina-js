@@ -54,12 +54,12 @@ function build_query_string(URLSearchParams, query) {
 }
 
 function make_request(http, params) {
+  const { opts, type, body, files } = params;
+
   let full_url = params.url;
   if (params.query) {
     full_url += build_query_string(http.URLSearchParams, params.query);
   }
-
-  const { opts, type, body, files } = params;
 
   const request =
     opts.method === 'GET'

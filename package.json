@@ -1,6 +1,6 @@
 {
   "name": "tinytina-js",
-  "version": "0.3.0",
+  "version": "0.4.0-alpha-1",
   "description": "Collection runner. Reads a collection in a json file in feeds it to a http client to make a request",
   "main": "src/main.js",
   "bin": {
@@ -22,12 +22,14 @@
   "dependencies": {
     "@zeit/arg": "^1.0.0",
     "ansi-colors": "^4.1.1",
+    "baretest": "^1.0.0",
     "color-support": "^1.1.3",
     "enquirer": "^2.3.2",
     "expand-template": "^2.0.3",
     "form-data": "^3.0.0",
     "jsome": "^2.5.0",
     "jsonfile": "^5.0.0",
+    "mergerino": "^0.4.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {

@@ -1,1 +1,1 @@
-module.exports = () => 'v0.3.0';
+module.exports = () => 'v0.4.0-alpha-1';

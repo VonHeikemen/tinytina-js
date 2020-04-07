@@ -1,12 +1,14 @@
 dependencies:
   '@zeit/arg': 1.0.0
   ansi-colors: 4.1.1
+  baretest: 1.0.0
   color-support: 1.1.3
   enquirer: 2.3.2
   expand-template: 2.0.3
   form-data: 3.0.0
   jsome: 2.5.0
   jsonfile: 5.0.0
+  mergerino: 0.4.0
   node-fetch: 2.6.0
 devDependencies:
   mocha: 6.2.2
@@ -73,6 +75,16 @@ packages:
     dev: true
     resolution:
       integrity: sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+  /barecolor/1.0.1:
+    dev: false
+    resolution:
+      integrity: sha512-ncJ680U+r1CGBt73L3O6V9GIAPy3hbDmWODEQajwEnDmmzeStvc4UYhapUSxUpS76+MHxyRihzZfwhyl122Zdw==
+  /baretest/1.0.0:
+    dependencies:
+      barecolor: 1.0.1
+    dev: false
+    resolution:
+      integrity: sha512-cpmgArX/eouyMhzD+Ppgr7R07qObCdeVcSe6+zd45RJ9H/xHk4OUnaqt5oJC0nuP0XxvyEetz20ZXXQZMgfrLw==
   /brace-expansion/1.1.11:
     dependencies:
       balanced-match: 1.0.0
@@ -536,6 +548,10 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-qX2bG48pTqYRVmDB37rn/6PT7LcR8T7oAX3bf99u1Tt1nzxYfxkgqDwUwolPlXweM0XzBOBFzSx4kfp7KP1s/w==
+  /mergerino/0.4.0:
+    dev: false
+    resolution:
+      integrity: sha512-dvyWWLp9GN7OZoAoqn1u2ewCDV06oggVi6AwFsgHxUV8jNnaTOMEyux3fZ7Njm7Hg/ypK2+M0p6liCIEWcJnbg==
   /mime-db/1.42.0:
     dev: false
     engines:
@@ -1024,12 +1040,14 @@ packages:
 specifiers:
   '@zeit/arg': ^1.0.0
   ansi-colors: ^4.1.1
+  baretest: ^1.0.0
   color-support: ^1.1.3
   enquirer: ^2.3.2
   expand-template: ^2.0.3
   form-data: ^3.0.0
   jsome: ^2.5.0
   jsonfile: ^5.0.0
+  mergerino: ^0.4.0
   mocha: ^6.2.2
   node-fetch: ^2.6.0
   prettier: ^1.19.1

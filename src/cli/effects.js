@@ -152,6 +152,7 @@ function pretty_err(debug, error) {
 }
 
 module.exports = {
+  fetch: http,
   http: http_client,
   log,
   log_effect,

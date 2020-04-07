@@ -1,4 +1,10 @@
+const { join } = require('path');
 const { URLSearchParams } = require('url');
+
+const suite = require('baretest');
+const merge = require('mergerino');
+const fetch = require('node-fetch');
+const jsonfile = require('jsonfile');
 
 const { interactive } = require('./interactive');
 const { log_effect } = require('./effects');
@@ -7,6 +13,14 @@ const version = require('./version');
 
 const { bind, is_empty, map, reduce } = require('../common/utils');
 const Result = require('../common/Result');
+
+function parse_json(str) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return str;
+  }
+}
 
 function show(fn) {
   return (...args) => log_effect(true, fn, ...args);
@@ -104,6 +118,55 @@ function run_interactive(reader, state, { config, args }) {
   return Result.Ok(_effect);
 }
 
+function run_script(reader, state, { config, args }) {
+  const fetch_options = bind(reader.build_fetch_options, state.env);
+  const script = require(join(process.cwd(), config.path));
+
+  const get_request = function(parse, query) {
+    return search_requests(reader, state, [parse(query)]).map(res => res[0]);
+  };
+
+  async function _effect({ fetch }) {
+    const get_data = function(query) {
+      return get_request(config.parse_query, query).cata(
+        req => Promise.resolve(fetch_options(req[0])),
+        err => Promise.reject(err)
+      );
+    };
+
+    const send = function(query, options) {
+      const result = get_request(config.parse_query, query);
+      const create_options = request => merge(fetch_options(request), options);
+
+      return result.cata(
+        req => fetch(create_options, req)[0],
+        err => Promise.reject(err)
+      );
+    };
+
+    const json = function(...args) {
+      return send(...args).then(res => res.json());
+    };
+
+    return script(
+      {
+        suite,
+        fetch,
+        parse_json,
+        jsonfile,
+        http: { send, get_data, json },
+        env: {
+          name: state.env_name,
+          data: state.env
+        }
+      },
+      args
+    );
+  }
+
+  return Result.Ok(_effect);
+}
+
 function list(reader, state, { args }) {
   const list = reader.list_requests(state.collection);
   return reader.list_to_string(args[0], list);
@@ -129,7 +192,8 @@ module.exports = {
   run: {
     all: run_all,
     collection: run_collection,
-    interactive: run_interactive
+    interactive: run_interactive,
+    test: run_script
   },
   help: show(help),
   version: show(version),

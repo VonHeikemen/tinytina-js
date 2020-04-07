@@ -136,7 +136,7 @@ module.exports = function help() {
           tinytina --schema ./example.json convert-to curl auth:login
 
       Show multiple requests as curl commands and change argument delimeter to a newline (bash):
-          tinytina --schema ./example.json --arg-separator $'\n' convert-to curl auth:login,logout
+          tinytina --schema ./example.json --arg-separator \$'\\n' convert-to curl auth:login,logout
 
       Render the schema as markdown document:
           tinytina --schema ./example.json --env dev markdown
@@ -145,6 +145,6 @@ module.exports = function help() {
           tinytina --schema ./example.json --exclude "user auth:login" markdown
 
       Choose a httpie as syntax for the commands shown in the markdown document (bash):
-          tinytina --schema ./example.json --example-syntax httpie --arg-separator $' \\\n' markdown
+          tinytina --schema ./example.json --example-syntax httpie --arg-separator \$' \\\\\\n' markdown
 `;
 };

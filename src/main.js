@@ -12,7 +12,7 @@ const {
   doc
 } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
-const { http, log, pretty_err } = require('./cli/effects');
+const { fetch, http, log, pretty_err } = require('./cli/effects');
 const { create_reader } = require('./common/reader');
 const { bind, is_nil, is_empty, identity, reject } = require('./common/utils');
 
@@ -76,10 +76,13 @@ async function main({
     case 'markdown':
       state = await create_state();
       return doc(reader, state, command);
+    case 'test-script':
+      state = await create_state();
+      return run.test(reader, state, command);
   }
 }
 
 main(process_args(process.argv.slice(2)))
   .then(res => res.cata(identity, reject))
-  .then(effect => effect({ http, log }))
+  .then(effect => effect({ fetch, http, log }))
   .catch(e => console.error(pretty_err(process.argv.includes('--debug'), e)));
