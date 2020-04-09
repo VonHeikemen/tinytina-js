@@ -1,4 +1,4 @@
-const { join, resolve } = require('path');
+const { resolve } = require('path');
 const { URLSearchParams } = require('url');
 
 const suite = require('baretest');
@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const jsonfile = require('jsonfile');
 
 const { interactive } = require('./interactive');
-const { log_effect } = require('./effects');
+const { log_effect, print, jsome } = require('./effects');
 const help = require('./help');
 const version = require('./version');
 
@@ -120,41 +120,55 @@ function run_interactive(reader, state, { config, args }) {
 
 function run_script(reader, state, { config, args }) {
   const fetch_options = bind(reader.build_fetch_options, state.env);
-  const script = require(resolve(config.path));
 
   const get_request = function(parse, query) {
     return search_requests(reader, state, [parse(query)]).map(res => res[0]);
   };
 
-  async function _effect({ fetch }) {
-    const get_data = function(query) {
-      return get_request(config.parse_query, query).cata(
-        req => Promise.resolve(fetch_options(req[0])),
-        err => Promise.reject(err)
-      );
-    };
+  const get_data = function(query) {
+    return get_request(config.parse_query, query).cata(
+      req => Promise.resolve(fetch_options(req[0])),
+      err => Promise.reject(err)
+    );
+  };
 
-    const send = function(query, options) {
-      const result = get_request(config.parse_query, query);
-      const create_options = request => merge(fetch_options(request), options);
+  const create_run = fetch => (query, options) => {
+    const result = get_request(config.parse_query, query);
+    const create_options = request => merge(fetch_options(request), options);
 
-      return result.cata(
-        req => fetch(create_options, req)[0],
-        err => Promise.reject(err)
-      );
-    };
+    return result.cata(
+      req => fetch(create_options, req)[0],
+      err => Promise.reject(err)
+    );
+  };
 
-    const json = function(...args) {
-      return send(...args).then(res => res.json());
-    };
+  const create_json = run => (...args) =>
+    run(...args).then(res => res.json());
+
+  const create_send = run => (...args) =>
+    run(...args).then(res => res.text());
+
+  async function _effect({ fetch, require }) {
+    const script = require(resolve(config.path));
+    const run = create_run(fetch);
 
     return script(
       {
         suite,
-        fetch,
-        parse_json,
-        jsonfile,
-        http: { send, get_data, json },
+        print: jsome,
+        http: {
+          fetch,
+          get_data, 
+          run,
+          send: create_send(run), 
+          json: create_json(run) 
+        },
+        json: {
+          print,
+          parse: parse_json,
+          readFile: jsonfile.readFile,
+          writeFile: jsonfile.writeFile
+        },
         env: {
           name: state.env_name,
           data: state.env

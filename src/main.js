@@ -84,5 +84,5 @@ async function main({
 
 main(process_args(process.argv.slice(2)))
   .then(res => res.cata(identity, reject))
-  .then(effect => effect({ fetch, http, log }))
+  .then(effect => effect({ fetch, http, log, require }))
   .catch(e => console.error(pretty_err(process.argv.includes('--debug'), e)));

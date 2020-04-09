@@ -152,6 +152,8 @@ function pretty_err(debug, error) {
 }
 
 module.exports = {
+  jsome,
+  print: safe_parse,
   fetch: http,
   http: http_client,
   log,
