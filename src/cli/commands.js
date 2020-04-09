@@ -142,11 +142,9 @@ function run_script(reader, state, { config, args }) {
     );
   };
 
-  const create_json = run => (...args) =>
-    run(...args).then(res => res.json());
+  const create_json = run => (...args) => run(...args).then(res => res.json());
 
-  const create_send = run => (...args) =>
-    run(...args).then(res => res.text());
+  const create_send = run => (...args) => run(...args).then(res => res.text());
 
   async function _effect({ fetch, require }) {
     const script = require(resolve(config.path));
@@ -158,10 +156,10 @@ function run_script(reader, state, { config, args }) {
         print: jsome,
         http: {
           fetch,
-          get_data, 
+          get_data,
           run,
-          send: create_send(run), 
-          json: create_json(run) 
+          send: create_send(run),
+          json: create_json(run)
         },
         json: {
           print,
