@@ -11,6 +11,7 @@ module.exports = function help() {
       tinytina [OPTIONS] run-all 
       tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] markdown
+      tinytina [OPTIONS] test-script script-path [args]
 
   COMMANDS
       run:
@@ -32,6 +33,11 @@ module.exports = function help() {
       markdown, md:
           Show the json schema as a markdown document. Use the option '--example-syntax' to choose the syntax of
           the commands shown as examples and '--arg-separator' to choose the arguments delimeter. 
+
+      test-script:
+          It takes a javascript file that exposes a function through 'module.exports' and executes that function.
+          The function will receive two arguments: the first will be a 'context' object with several utilities and
+          the second will be an array with the rest of the arguments that you provided to the script.
 
   OPTIONS
       -h, --help                          Shows this help message
@@ -90,7 +96,7 @@ module.exports = function help() {
               - data: Params to be used in a POST request. It can be an array of objects with the 
                 properties "name" and "value" or a json object. If it is a json object it will be converted to a string
                 and the header 'Content-type' will be set to 'application/json.'
-              - data-description: In the case where data is an object you can use this property to store the "metadata" 
+              - data-description: In the case where data is an object you can use this property to store the "metadata"
                 of the key-value pairs
               - files: A list of files to be uploaded.
               - "headers", "query" and "files" must be arrays of objects, 
@@ -98,6 +104,73 @@ module.exports = function help() {
                  Additionaly they can have a "metadata" property which 
                  should be and object that stores additional data that 
                  will be use by the 'markdown' command to display a table.
+
+  ADVANCE USAGE
+      This feature assumes you have knowledge of javascript, that is because if you ever do need to use it then you
+      should be using another tool. But in the odd case you still want to use tinytina, we got your back.
+
+      To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a 
+      command called 'test-script', with it you can use a script with valid javascript syntax to run the requests in
+      any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
+
+      \`\`\`
+      module.exports = async function(context, args) {
+        const [query] = args;
+        const { http, json } = context;
+
+        await http.send(query).then(json.print);
+      };
+      \`\`\`
+
+    This is how you would use it in the command line.
+
+    tinytina --schema ./schema.json -env dev test-script ./path-to-script.js collection-id:request-id
+
+    The 'context' object within the script has the following properties.
+ 
+      - print
+        A function that can "pretty print" any text you pass to it.
+      - env
+        An object that contains the information about the current environment variables
+        - name
+          The name of the environment
+        - data
+          The variables available to the requests
+      - json
+        - parse
+          A function that will try to convert a text into a json object and return the result.
+          If it fails, it returns the original text.
+        - print
+          A function that will first try to convert a plain text into a json object, if it is a valid json 
+          string it will print it to the screen, if it fails it will print the text.
+        - readfile
+          A function that can process a valid .json file. The process in handled by the 'jsonfile' package.
+          Find out more about it here: https://www.npmjs.com/package/jsonfile
+        - writefile
+          A function that write a valid json file in the filesystem. The process in handled by the 'jsonfile' package.
+      - http
+        An object with utility functions that will help you run the requests
+        - get_data
+          A function that takes a query and gives you back an object that contains all 
+          the data that will be send in the request.
+        - fetch
+          A function, the http client that executes the request. 
+          Find out more about it here: https://www.npmjs.com/package/node-fetch
+        - run
+          A function that uses 'fetch' to send a request, it takes two parameters:
+            1. The query of the request you want to run
+            2. a data object that can replace the original data of the request
+            This object can be anything that the package 'mergerino' can handle.
+            Find out more about it here: https://www.npmjs.com/package/mergerino
+        - send
+          A function that uses 'run' to send a request and gives you back the body of the response as text.
+          It takes the same parameters as 'run'.
+        - json
+          A function that uses 'run' to send a request and gives you back the body of the response as a json object.
+          It takes the same parameters as 'run'.
+      - suite
+        A function that creates a "test suite". This test suite in handled by the package 'baretest'
+        Find out more about it here: https://www.npmjs.com/package/baretest
 
   EXAMPLES
       Assuming "tinytina" is an executable already in your PATH.
@@ -146,5 +219,8 @@ module.exports = function help() {
 
       Choose a httpie as syntax for the commands shown in the markdown document (bash):
           tinytina --schema ./example.json --example-syntax httpie --arg-separator \$' \\\\\\n' markdown
+
+      Use a script to execute the http requests on the schema:
+          tinytina --schema ./example.json --env dev test-script ./script.js
 `;
 };
