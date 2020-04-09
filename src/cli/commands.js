@@ -146,34 +146,36 @@ function run_script(reader, state, { config, args }) {
 
   const create_send = run => (...args) => run(...args).then(res => res.text());
 
-  async function _effect({ fetch, require }) {
-    const script = require(resolve(config.path));
+  async function _effect({ add_global, fetch, require }) {
     const run = create_run(fetch);
-
-    return script(
-      {
-        suite,
-        print: jsome,
-        http: {
-          fetch,
-          get_data,
-          run,
-          send: create_send(run),
-          json: create_json(run)
-        },
-        json: {
-          print,
-          parse: parse_json,
-          readFile: jsonfile.readFile,
-          writeFile: jsonfile.writeFile
-        },
-        env: {
-          name: state.env_name,
-          data: state.env
-        }
+    const context = {
+      argv: args,
+      suite,
+      print: jsome,
+      http: {
+        fetch,
+        get_data,
+        run,
+        send: create_send(run),
+        json: create_json(run)
       },
-      args
-    );
+      json: {
+        print,
+        parse: parse_json,
+        readfile: jsonfile.readFile,
+        writefile: jsonfile.writeFile
+      },
+      env: {
+        name: state.env_name,
+        data: state.env
+      }
+    };
+
+    add_global('tinytina', context);
+
+    const script = require(resolve(config.path));
+
+    return script(args);
   }
 
   return Result.Ok(_effect);

@@ -151,8 +151,13 @@ function pretty_err(debug, error) {
   return msg;
 }
 
+function add_global(key, value) {
+  global[key] = value;
+}
+
 module.exports = {
   jsome,
+  add_global,
   print: safe_parse,
   fetch: http,
   http: http_client,

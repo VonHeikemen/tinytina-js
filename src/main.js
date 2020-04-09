@@ -12,7 +12,7 @@ const {
   doc
 } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
-const { fetch, http, log, pretty_err } = require('./cli/effects');
+const { add_global, fetch, http, log, pretty_err } = require('./cli/effects');
 const { create_reader } = require('./common/reader');
 const { bind, is_nil, is_empty, identity, reject } = require('./common/utils');
 
@@ -84,5 +84,5 @@ async function main({
 
 main(process_args(process.argv.slice(2)))
   .then(res => res.cata(identity, reject))
-  .then(effect => effect({ fetch, http, log, require }))
+  .then(effect => effect({ add_global, fetch, http, log, require }))
   .catch(e => console.error(pretty_err(process.argv.includes('--debug'), e)));

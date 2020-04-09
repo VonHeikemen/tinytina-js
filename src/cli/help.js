@@ -114,10 +114,10 @@ module.exports = function help() {
       any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
 
       \`\`\`
-      module.exports = async function(context, args) {
-        const [query] = args;
-        const { http, json } = context;
+      const { http, json, argv } = global.tinytina;
+      const [query] = argv;
 
+      module.exports = async function() {
         await http.send(query).then(json.print);
       };
       \`\`\`
@@ -126,8 +126,10 @@ module.exports = function help() {
 
     tinytina --schema ./schema.json -env dev test-script ./path-to-script.js collection-id:request-id
 
-    The 'context' object within the script has the following properties.
+    The 'global.tinytina' object within the script has the following properties.
  
+      - argv
+        An array containing the rest of the parameters after the script's path
       - print
         A function that can "pretty print" any text you pass to it.
       - env
