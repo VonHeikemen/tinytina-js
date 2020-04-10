@@ -120,9 +120,18 @@ function run_interactive(reader, state, { config, args }) {
 
 function run_script(reader, state, { config, args }) {
   const fetch_options = bind(reader.build_fetch_options, state.env);
+  const allow_one = query => req =>
+    req.length === 1
+      ? Result.Ok(req)
+      : Result.Err(
+          'Can only process one request. ' +
+            `Found ${req.length} results for the query ${query}.`
+        );
 
   const get_request = function(parse, query) {
-    return search_requests(reader, state, [parse(query)]).map(res => res[0]);
+    return search_requests(reader, state, [parse(query)])
+      .map(res => res[0])
+      .chain(allow_one(query));
   };
 
   const get_data = function(query) {
