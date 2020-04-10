@@ -335,3 +335,186 @@ test('render a "markdown" document', function() {
   const result = effect({ log: stub });
   t.equal(result, expected.markdown, 'a markdown document');
 });
+
+suite('# cli - test-script command');
+
+test('exported function gets command line arguments', async function() {
+  const command = {
+    name: 'test-script',
+    args: ['somearg'],
+    config: {
+      path: './path-to-script.js',
+      request_prop: 'id'
+    }
+  };
+
+  const context = {};
+  const add_global = (key, value) => (context[key] = value);
+
+  const effect = run
+    .test(reader, create_state(), command)
+    .cata(identity, constant);
+
+  const result = await effect({ add_global, fetch: stub, require: stub });
+
+  t.deepEqual(result, ['somearg'], 'function receives the right arguments');
+});
+
+test('context object has the right shape', function() {
+  const command = {
+    name: 'test-script',
+    args: ['somearg'],
+    config: {
+      path: './path-to-script.js',
+      request_prop: 'id'
+    }
+  };
+
+  const context = {};
+  const add_global = (key, value) => (context[key] = value);
+
+  const effect = run
+    .test(reader, create_state(), command)
+    .cata(identity, constant);
+
+  effect({ add_global, fetch: stub, require: stub });
+
+  t.ok('tinytina' in context, 'the context tinytina exists');
+
+  t.deepEqual(
+    ['argv', 'suite', 'print', 'http', 'json', 'env'],
+    Object.keys(context.tinytina),
+    'tinytina object has all the dependencies'
+  );
+
+  t.deepEqual(
+    ['fetch', 'get_data', 'run', 'send', 'json'],
+    Object.keys(context.tinytina.http),
+    'tinytina.http has the right shape'
+  );
+
+  t.deepEqual(
+    ['print', 'parse', 'readfile', 'writefile'],
+    Object.keys(context.tinytina.json),
+    'tinytina.json object has all the dependencies'
+  );
+
+  t.deepEqual(
+    ['name', 'data'],
+    Object.keys(context.tinytina.env),
+    'tinytina.json the right shape'
+  );
+});
+
+test('context object contains env variables', function() {
+  const command = {
+    name: 'test-script',
+    args: ['somearg'],
+    config: {
+      path: './path-to-script.js',
+      request_prop: 'id'
+    }
+  };
+
+  const state = create_state();
+  const context = {};
+  const add_global = (key, value) => (context[key] = value);
+
+  const effect = run.test(reader, state, command).cata(identity, constant);
+
+  effect({ add_global, fetch: stub, require: stub });
+
+  t.deepEqual(
+    context.tinytina.env.data,
+    { ...state.env },
+    'has state env variables'
+  );
+});
+
+test('http utilities can extract data from the schema', async function() {
+  const command = {
+    name: 'test-script',
+    args: ['somearg'],
+    config: {
+      path: './path-to-script.js',
+      request_prop: 'id'
+    }
+  };
+
+  const expected = {
+    opts: {
+      headers: {
+        Authorization: '{api-key}'
+      },
+      method: 'POST'
+    },
+    url: 'http://localhost:3000/service/register',
+    query: {
+      stuff: 'this goes in the URL as a querystring'
+    },
+    files: {
+      image: '/tmp/yourface.jpg'
+    },
+    type: 'form',
+    body: {
+      name: 'some test value',
+      lastname: 'body-ish',
+      email: 'not-real-deal',
+      code: 'no-one-should-see-me'
+    }
+  };
+
+  const query = 'short-id:also-short';
+  const state = create_state();
+  const context = {};
+  const add_global = (key, value) => (context[key] = value);
+  const fetch = (options, request) => [
+    Promise.resolve({
+      json: () => options(request[0]),
+      text: () => options(request[0])
+    })];
+
+  const effect = run.test(reader, state, command).cata(identity, constant);
+
+  effect({ add_global, fetch, require: stub });
+
+  const { http } = context.tinytina;
+
+  const request_data = await http.get_data(query);
+  t.deepEqual(request_data, expected, '');
+
+  const send_data = await http.send(query);
+  t.deepEqual(send_data, expected, 'send can get the request data');
+
+  const json_data = await http.json(query);
+  t.deepEqual(json_data, expected, 'json can get the request data');
+});
+
+test('exposes external dependencies', function() {
+  const baretest = require('baretest');
+  const jsonfile = require('jsonfile');
+  const jsome = require('jsome');
+
+  const command = {
+    name: 'test-script',
+    args: ['somearg'],
+    config: {
+      path: './path-to-script.js',
+      request_prop: 'id'
+    }
+  };
+
+  const context = {};
+  const add_global = (key, value) => (context[key] = value);
+
+  const effect = run.test(reader, create_state(), command).cata(identity, constant);
+
+  effect({ add_global, fetch: stub, require: stub });
+
+  const { suite, json, print } = context.tinytina;
+
+  t.ok(baretest == suite);
+  t.ok(print == jsome);
+  t.ok(jsonfile.readFile == json.readfile);
+  t.ok(jsonfile.writeFile == json.writefile);
+});

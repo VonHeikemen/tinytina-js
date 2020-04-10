@@ -119,11 +119,10 @@ function process_args(process_argv) {
       break;
     }
     case 'test-script': {
-      const parse = bind(parse_query, get_or('id', '--request-prop', args));
       opts.command.args = argv.slice(2);
       opts.command.config = {
         path: argv[1],
-        parse_query: parse
+        request_prop: get_or('id', '--request-prop', args)
       };
       break;
     }

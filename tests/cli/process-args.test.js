@@ -158,6 +158,26 @@ test('gather arguments for "markdown" command', function() {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
+test('gather arguments for "test-script" command', function() {
+  const expected = {
+    ...fake_args('test-script'),
+    command: {
+      name: 'test-script',
+      args: ['query'],
+      config: {
+        path: './path-to-script.js',
+        request_prop: 'id'
+      }
+    }
+  };
+
+  const result = process_args(
+    cli_input(['test-script', './path-to-script.js', 'query'])
+  );
+
+  t.deepEqual(result, expected, 'arguments object has the right shape');
+});
+
 test('return error when --schema is missing', function() {
   const expected = {
     err: { message: 'must provide --schema with a path to a json file' }
