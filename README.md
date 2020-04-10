@@ -226,7 +226,7 @@ For example, you can have a "host" variable that has the value `http://localhost
 ### Advance usage
 This feature assumes you have knowledge of javascript, that is because if you ever do need to use it then you should be using another tool. But in the odd case you still want to use tinytina, we got your back.
 
-To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a command called 'test-script', with it you can use a script with valid javascript syntax to run the requests in any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
+To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a command called `test-script`, with it you can use a script with valid javascript syntax to run the requests in any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
 
 ```js
 const { http, json, argv } = global.tinytina;
@@ -243,7 +243,7 @@ This is how you would use it in the command line.
 tinytina --schema ./schema.json -env dev test-script ./path-to-script.js collection-id:request-id
 ```
 
-The 'global.tinytina' object within the script has the following properties.
+The `global.tinytina` object within the script has the following properties.
 
 | Property           | Description   |
 |--------------------|---------------|
@@ -255,13 +255,13 @@ The 'global.tinytina' object within the script has the following properties.
 |`json`              | An object with utility functions |
 |`json.parse`        | A function that will try to convert a text into a json object and return the result. If it fails, it returns the original text. |
 |`json.print`        | A function that will first try to convert a plain text into a json object, if it is a valid json string it will print it to the screen, if it fails it will print the text. |
-|`json.readfile`     | A function that can process a valid .json file. The process in handled by the '[jsonfile](https://www.npmjs.com/package/jsonfile)' package. |
-|`json.writefile`    | A function that write a valid json file in the filesystem. The process in handled by the '[jsonfile](https://www.npmjs.com/package/jsonfile)' package. |
+|`json.readfile`     | A function that can process a valid .json file. The process in handled by the [jsonfile](https://www.npmjs.com/package/jsonfile) package. |
+|`json.writefile`    | A function that write a valid json file in the filesystem. The process in handled by the [jsonfile](https://www.npmjs.com/package/jsonfile) package. |
 |`http`              | An object with utility functions that will help you run the requests. |
 |`http.get_data`     | A function that takes a query and gives you back an object that contains all the data that will be send in the request. |
 |`http.fetch`        | A function, the http client that executes the request. Find out more about it here: [node-fetch](https://www.npmjs.com/package/node-fetch). |
-|`http.run`          | A function that uses 'fetch' to send a request, it takes two parameters: 1. The query of the request you want to run 2. a data object that can replace the original data of the request. This object can be anything that the package '[mergerino](https://www.npmjs.com/package/mergerino)' can handle. |
-|`http.send`         | A function that uses 'http.run' to send a request and gives you back the body of the response as text. It takes the same parameters as 'run'. |
-|`http.json`         | A function that uses 'http.run' to send a request and gives you back the body of the response as a json object. It takes the same parameters as 'run'. |
-|`suite`             | A function that creates a "test suite". This test suite in handled by the package '[baretest](https://www.npmjs.com/package/baretest)'. |
+|`http.run`          | A function that uses `fetch` to send a request, it takes two parameters: 1. The query of the request you want to run 2. a data object that can replace the original data of the request. This object can be anything that the package '[mergerino](https://www.npmjs.com/package/mergerino)' can handle. |
+|`http.send`         | A function that uses `http.run` to send a request and gives you back the body of the response as text. It takes the same parameters as `http.run`. |
+|`http.json`         | A function that uses `http.run` to send a request and gives you back the body of the response as a json object. It takes the same parameters as `http.run`. |
+|`suite`             | A function that creates a "test suite". This test suite in handled by the package [baretest](https://www.npmjs.com/package/baretest). |
 
