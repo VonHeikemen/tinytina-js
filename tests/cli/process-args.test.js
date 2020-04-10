@@ -176,11 +176,11 @@ test('return error when unknown argument is given', function() {
 });
 
 test('return error when command name is invalid', function() {
-  const expected = 'Must provide a valid command';
+  const expected = 'runner is not a valid command';
   const result_mispelled = process_args(['runner', 'auth:login']);
 
   t.equal(result_mispelled.err.message, expected, '');
 
   const result_empty = process_args([]);
-  t.equal(result_empty.err.message, expected, '');
+  t.equal(result_empty.err.message, 'Must provide a command', '');
 });

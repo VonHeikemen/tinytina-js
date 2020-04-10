@@ -128,9 +128,13 @@ function process_args(process_argv) {
       break;
     }
     default:
+      const message = opts.command.name.length
+        ? `${opts.command.name} is not a valid command`
+        : 'Must provide a command';
+
       return {
         err: {
-          message: `${opts.command.name} is not a valid command`,
+          message,
           info: 'use the --help command to learn about the available commands'
         }
       };
