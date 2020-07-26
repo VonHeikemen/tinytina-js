@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+require('array-flat-polyfill');
 const jsonfile = require('jsonfile');
 
 const { prompt, next_action } = require('./cli/interactive');
