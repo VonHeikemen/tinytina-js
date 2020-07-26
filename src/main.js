@@ -76,9 +76,9 @@ async function main({
     case 'markdown':
       state = await create_state();
       return doc(reader, state, command);
-    case 'test-script':
+    case 'use-script':
       state = await create_state();
-      return run.test(reader, state, command);
+      return run.use_script(reader, state, command);
   }
 }
 

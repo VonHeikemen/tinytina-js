@@ -336,11 +336,11 @@ test('render a "markdown" document', function() {
   t.equal(result, expected.markdown, 'a markdown document');
 });
 
-suite('# cli - test-script command');
+suite('# cli - use-script command');
 
 test('exported function gets command line arguments', async function() {
   const command = {
-    name: 'test-script',
+    name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
@@ -352,7 +352,7 @@ test('exported function gets command line arguments', async function() {
   const add_global = (key, value) => (context[key] = value);
 
   const effect = run
-    .test(reader, create_state(), command)
+    .use_script(reader, create_state(), command)
     .cata(identity, constant);
 
   const result = await effect({ add_global, fetch: stub, require: stub });
@@ -362,7 +362,7 @@ test('exported function gets command line arguments', async function() {
 
 test('context object has the right shape', function() {
   const command = {
-    name: 'test-script',
+    name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
@@ -374,7 +374,7 @@ test('context object has the right shape', function() {
   const add_global = (key, value) => (context[key] = value);
 
   const effect = run
-    .test(reader, create_state(), command)
+    .use_script(reader, create_state(), command)
     .cata(identity, constant);
 
   effect({ add_global, fetch: stub, require: stub });
@@ -408,7 +408,7 @@ test('context object has the right shape', function() {
 
 test('context object contains env variables', function() {
   const command = {
-    name: 'test-script',
+    name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
@@ -420,7 +420,7 @@ test('context object contains env variables', function() {
   const context = {};
   const add_global = (key, value) => (context[key] = value);
 
-  const effect = run.test(reader, state, command).cata(identity, constant);
+  const effect = run.use_script(reader, state, command).cata(identity, constant);
 
   effect({ add_global, fetch: stub, require: stub });
 
@@ -433,7 +433,7 @@ test('context object contains env variables', function() {
 
 test('http utilities can extract data from the schema', async function() {
   const command = {
-    name: 'test-script',
+    name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
@@ -474,7 +474,7 @@ test('http utilities can extract data from the schema', async function() {
       text: () => options(request[0])
     })];
 
-  const effect = run.test(reader, state, command).cata(identity, constant);
+  const effect = run.use_script(reader, state, command).cata(identity, constant);
 
   effect({ add_global, fetch, require: stub });
 
@@ -496,7 +496,7 @@ test('exposes external dependencies', function() {
   const jsome = require('jsome');
 
   const command = {
-    name: 'test-script',
+    name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
@@ -507,7 +507,7 @@ test('exposes external dependencies', function() {
   const context = {};
   const add_global = (key, value) => (context[key] = value);
 
-  const effect = run.test(reader, create_state(), command).cata(identity, constant);
+  const effect = run.use_script(reader, create_state(), command).cata(identity, constant);
 
   effect({ add_global, fetch: stub, require: stub });
 

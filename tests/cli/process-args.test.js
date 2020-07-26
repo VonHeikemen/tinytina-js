@@ -158,11 +158,11 @@ test('gather arguments for "markdown" command', function() {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
-test('gather arguments for "test-script" command', function() {
+test('gather arguments for "use-script" command', function() {
   const expected = {
-    ...fake_args('test-script'),
+    ...fake_args('use-script'),
     command: {
-      name: 'test-script',
+      name: 'use-script',
       args: ['query'],
       config: {
         path: './path-to-script.js',
@@ -172,7 +172,7 @@ test('gather arguments for "test-script" command', function() {
   };
 
   const result = process_args(
-    cli_input(['test-script', './path-to-script.js', 'query'])
+    cli_input(['use-script', './path-to-script.js', 'query'])
   );
 
   t.deepEqual(result, expected, 'arguments object has the right shape');

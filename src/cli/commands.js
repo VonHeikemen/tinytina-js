@@ -218,7 +218,7 @@ module.exports = {
     all: run_all,
     collection: run_collection,
     interactive: run_interactive,
-    test: run_script
+    use_script: run_script
   },
   help: show(help),
   version: show(version),

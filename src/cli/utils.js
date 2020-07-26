@@ -118,7 +118,7 @@ function process_args(process_argv) {
       };
       break;
     }
-    case 'test-script': {
+    case 'use-script': {
       opts.command.args = argv.slice(2);
       opts.command.config = {
         path: argv[1],
