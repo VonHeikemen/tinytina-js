@@ -4,7 +4,7 @@ Is a command-line utility that reads data from a json file and feeds it to an ht
 
 ## Getting started
 
-To run Tinytina, ensure that you have Node.js >= v11. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
+To run Tinytina, ensure that you have Node.js >= v10. [Install Node.js via package manager](https://nodejs.org/en/download/package-manager/).
 
 ### Installation
 
@@ -61,6 +61,9 @@ It transforms a request query or a list of queries into a shell commands and pri
 
 #### `tinytina [OPTIONS] markdown`
 Shows the json schema as a markdown document. Use the option '--example-syntax' to choose the commands shown as examples and '--arg-separator' to choose the arguments delimeter.
+
+#### `tinytina [OPTIONS] use-script [args]`
+Use a custom script with valid javascript syntax to execute any kind of extra logic. See the `Advance usage` section.
 
 ### Command Line Options
 - `-h`, `--help`<br/>
@@ -226,7 +229,7 @@ For example, you can have a "host" variable that has the value `http://localhost
 ### Advance usage
 This feature assumes you have knowledge of javascript, that is because if you ever do need to use it then you should be using another tool. But in the odd case you still want to use tinytina, we got your back.
 
-To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a command called `test-script`, with it you can use a script with valid javascript syntax to run the requests in any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
+To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a command called `use-script`, with it you can use a script with valid javascript syntax to run the requests in any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
 
 ```js
 const { http, json, argv } = global.tinytina;
@@ -240,7 +243,7 @@ module.exports = async function() {
 This is how you would use it in the command line.
 
 ```
-tinytina --schema ./schema.json -env dev test-script ./path-to-script.js collection-id:request-id
+tinytina --schema ./schema.json --env dev use-script ./path-to-script.js collection-id:request-id
 ```
 
 The `global.tinytina` object within the script has the following properties.

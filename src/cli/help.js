@@ -11,7 +11,7 @@ module.exports = function help() {
       tinytina [OPTIONS] run-all 
       tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] markdown
-      tinytina [OPTIONS] test-script script-path [args]
+      tinytina [OPTIONS] use-script script-path [args]
 
   COMMANDS
       run:
@@ -34,10 +34,9 @@ module.exports = function help() {
           Show the json schema as a markdown document. Use the option '--example-syntax' to choose the syntax of
           the commands shown as examples and '--arg-separator' to choose the arguments delimeter. 
 
-      test-script:
+      use-script:
           It takes a javascript file that exposes a function through 'module.exports' and executes that function.
-          The function will receive two arguments: the first will be a 'context' object with several utilities and
-          the second will be an array with the rest of the arguments that you provided to the script.
+          For further information see the ADVANCE USAGE section.
 
   OPTIONS
       -h, --help                          Shows this help message
@@ -110,7 +109,7 @@ module.exports = function help() {
       should be using another tool. But in the odd case you still want to use tinytina, we got your back.
 
       To give the user the ability to apply any kind of logic to the execution of the requests tinytina exposes a 
-      command called 'test-script', with it you can use a script with valid javascript syntax to run the requests in
+      command called 'use-script', with it you can use a script with valid javascript syntax to run the requests in
       any way you see fit. The following will be an example of the minimal amount of code you'll need to run a request.
 
       \`\`\`
@@ -124,7 +123,7 @@ module.exports = function help() {
 
     This is how you would use it in the command line.
 
-    tinytina --schema ./schema.json -env dev test-script ./path-to-script.js collection-id:request-id
+    tinytina --schema ./schema.json -env dev use-script ./path-to-script.js collection-id:request-id
 
     The 'global.tinytina' object within the script has the following properties.
  
@@ -223,6 +222,6 @@ module.exports = function help() {
           tinytina --schema ./example.json --example-syntax httpie --arg-separator \$' \\\\\\n' markdown
 
       Use a script to execute the http requests on the schema:
-          tinytina --schema ./example.json --env dev test-script ./script.js
+          tinytina --schema ./example.json --env dev use-script ./script.js
 `;
 };
