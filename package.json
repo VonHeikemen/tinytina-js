@@ -1,6 +1,6 @@
 {
   "name": "tinytina-js",
-  "version": "0.4.0-alpha-1",
+  "version": "0.4.0",
   "description": "Collection runner. Reads a collection in a json file in feeds it to a http client to make a request",
   "main": "src/main.js",
   "bin": {
