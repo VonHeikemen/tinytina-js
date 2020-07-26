@@ -23,18 +23,18 @@
     "@zeit/arg": "^1.0.0",
     "ansi-colors": "^4.1.1",
     "array-flat-polyfill": "^1.0.1",
-    "baretest": "^1.0.0",
+    "baretest": "^2.0.0",
     "color-support": "^1.1.3",
-    "enquirer": "^2.3.2",
+    "enquirer": "^2.3.6",
     "expand-template": "^2.0.3",
     "form-data": "^3.0.0",
     "jsome": "^2.5.0",
-    "jsonfile": "^5.0.0",
+    "jsonfile": "^6.0.1",
     "mergerino": "^0.4.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "mocha": "^8.0.1",
-    "prettier": "^1.19.1"
+    "prettier": "^2.0.5"
   }
 }

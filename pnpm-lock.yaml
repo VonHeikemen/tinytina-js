@@ -2,30 +2,24 @@ dependencies:
   '@zeit/arg': 1.0.0
   ansi-colors: 4.1.1
   array-flat-polyfill: 1.0.1
-  baretest: 1.0.0
+  baretest: 2.0.0
   color-support: 1.1.3
-  enquirer: 2.3.2
+  enquirer: 2.3.6
   expand-template: 2.0.3
   form-data: 3.0.0
   jsome: 2.5.0
-  jsonfile: 5.0.0
+  jsonfile: 6.0.1
   mergerino: 0.4.0
   node-fetch: 2.6.0
 devDependencies:
   mocha: 8.0.1
-  prettier: 1.19.1
+  prettier: 2.0.5
 lockfileVersion: 5.1
 packages:
   /@zeit/arg/1.0.0:
     dev: false
     resolution:
       integrity: sha512-SDP3IvXR6Dm1OlltSs2qp43CASYyc9QVZLYtFNRlE7HvghLE6sjXTNzVcEhYyt8Jc0YNhpTE+TITUwnTgR4Feg==
-  /ansi-colors/3.2.4:
-    dev: false
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-hHUXGagefjN2iRrID63xckIvotOXOojhQKWIPUZ4mNUZ9nLZW+7FMNoE1lOkEhNWYsx/7ysGIuJYCiMAA9FnrA==
   /ansi-colors/4.1.1:
     engines:
       node: '>=6'
@@ -99,12 +93,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-ncJ680U+r1CGBt73L3O6V9GIAPy3hbDmWODEQajwEnDmmzeStvc4UYhapUSxUpS76+MHxyRihzZfwhyl122Zdw==
-  /baretest/1.0.0:
+  /baretest/2.0.0:
     dependencies:
       barecolor: 1.0.1
     dev: false
     resolution:
-      integrity: sha512-cpmgArX/eouyMhzD+Ppgr7R07qObCdeVcSe6+zd45RJ9H/xHk4OUnaqt5oJC0nuP0XxvyEetz20ZXXQZMgfrLw==
+      integrity: sha512-hRmYnBojeijT3jH0GtqLoHus+adPoeYh2NmcNT3wBPH903AUphcFqs1gJ64fBovDXql51Df24g9D9jcXRZd4vA==
   /binary-extensions/2.1.0:
     dev: true
     engines:
@@ -267,14 +261,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==
-  /enquirer/2.3.2:
+  /enquirer/2.3.6:
     dependencies:
-      ansi-colors: 3.2.4
+      ansi-colors: 4.1.1
     dev: false
     engines:
       node: '>=8.6'
     resolution:
-      integrity: sha512-PLhTMPUXlnaIv9D3Cq3/Zr1xb7soeDDgunobyCmYLUG19n24dvC8i+ZZgm2DekGpDnx7JvFSHV7lxfM58PMtbA==
+      integrity: sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==
   /es-abstract/1.17.6:
     dependencies:
       es-to-primitive: 1.2.1
@@ -338,7 +332,7 @@ packages:
       is-stream: 1.1.0
       npm-run-path: 2.0.2
       p-finally: 1.0.0
-      signal-exit: 3.0.2
+      signal-exit: 3.0.3
       strip-eof: 1.0.0
     dev: false
     engines:
@@ -395,7 +389,7 @@ packages:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
-      mime-types: 2.1.25
+      mime-types: 2.1.27
     dev: false
     engines:
       node: '>= 6'
@@ -455,11 +449,11 @@ packages:
     dev: true
     resolution:
       integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
-  /graceful-fs/4.2.3:
+  /graceful-fs/4.2.4:
     dev: false
     optional: true
     resolution:
-      integrity: sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
+      integrity: sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
   /growl/1.10.5:
     dev: true
     engines:
@@ -653,14 +647,14 @@ packages:
     dev: false
     resolution:
       integrity: sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=
-  /jsonfile/5.0.0:
+  /jsonfile/6.0.1:
     dependencies:
-      universalify: 0.1.2
+      universalify: 1.0.0
     dev: false
     optionalDependencies:
-      graceful-fs: 4.2.3
+      graceful-fs: 4.2.4
     resolution:
-      integrity: sha512-NQRZ5CRo74MhMMC3/3r5g2k4fjodJ/wh8MxjFbCViWKFjxrnudWSY5vomh+23ZaXzAS7J3fBZIR2dV6WbmfM0w==
+      integrity: sha512-jR2b5v7d2vIOust+w3wtFKZIfpC2pnRmFAhAC/BuweZFQR8qZzxH1OyrQ10HmdVYiXWkYUqPVsz91cG7EL2FBg==
   /lcid/2.0.0:
     dependencies:
       invert-kv: 2.0.0
@@ -729,20 +723,20 @@ packages:
     dev: false
     resolution:
       integrity: sha512-dvyWWLp9GN7OZoAoqn1u2ewCDV06oggVi6AwFsgHxUV8jNnaTOMEyux3fZ7Njm7Hg/ypK2+M0p6liCIEWcJnbg==
-  /mime-db/1.42.0:
+  /mime-db/1.44.0:
     dev: false
     engines:
       node: '>= 0.6'
     resolution:
-      integrity: sha512-UbfJCR4UAVRNgMpfImz05smAXK7+c+ZntjaA26ANtkXLlOe947Aag5zdIcKQULAiF9Cq4WxBi9jUs5zkA84bYQ==
-  /mime-types/2.1.25:
+      integrity: sha512-/NOTfLrsPBVeH7YtFPgsVWveuL+4SjjYxaQ1xtM1KMFj7HdxlBlxeyNLzhyJVx7r4rZGJAZ/6lkKCitSc/Nmpg==
+  /mime-types/2.1.27:
     dependencies:
-      mime-db: 1.42.0
+      mime-db: 1.44.0
     dev: false
     engines:
       node: '>= 0.6'
     resolution:
-      integrity: sha512-5KhStqB5xpTAeGqKBAMgwaYMnQik7teQN4IAzC7npDv6kzeU6prfkR67bc87J1kWMPGkoaZSq1npmexMgkmEVg==
+      integrity: sha512-JIhqnCasI9yD+SsmkquHBxTSEuZdQX5BuQnS2Vc7puQQQ+8yiP5AY5uWhpdv4YL4VM5c6iliiYWPgJ/nJQLp7w==
   /mimic-fn/2.1.0:
     dev: false
     engines:
@@ -957,13 +951,13 @@ packages:
       node: '>=8.6'
     resolution:
       integrity: sha512-q0M/9eZHzmr0AulXyPwNfZjtwZ/RBZlbN3K3CErVrk50T2ASYI7Bye0EvekFY3IP1Nt2DHu0re+V2ZHIpMkuWg==
-  /prettier/1.19.1:
+  /prettier/2.0.5:
     dev: true
     engines:
-      node: '>=4'
+      node: '>=10.13.0'
     hasBin: true
     resolution:
-      integrity: sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
+      integrity: sha512-7PtVymN48hGcO4fGjybyBSIWDsLU4H4XlvOHfq91pz9kkGlonzwTfYkaIEwiRg/dAJF9YlbsduBAgtYLi+8cFg==
   /promise.allsettled/1.0.2:
     dependencies:
       array.prototype.map: 1.0.2
@@ -1030,10 +1024,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-2kL0l0DAtC2yypcoVxyxkMmO/qM=
-  /signal-exit/3.0.2:
+  /signal-exit/3.0.3:
     dev: false
     resolution:
-      integrity: sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
+      integrity: sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
   /sprintf-js/1.0.3:
     dev: true
     resolution:
@@ -1138,12 +1132,12 @@ packages:
       node: '>=8.0'
     resolution:
       integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==
-  /universalify/0.1.2:
+  /universalify/1.0.0:
     dev: false
     engines:
-      node: '>= 4.0.0'
+      node: '>= 10.0.0'
     resolution:
-      integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
+      integrity: sha512-rb6X1W158d7pRQBg5gkR8uPaSfiids68LTJQYOtEUhoJUWBdaQHsuT/EUduxXYxcrt4r5PJ4fuHW1MHT6p0qug==
   /which-module/2.0.0:
     resolution:
       integrity: sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=
@@ -1262,14 +1256,14 @@ specifiers:
   '@zeit/arg': ^1.0.0
   ansi-colors: ^4.1.1
   array-flat-polyfill: ^1.0.1
-  baretest: ^1.0.0
+  baretest: ^2.0.0
   color-support: ^1.1.3
-  enquirer: ^2.3.2
+  enquirer: ^2.3.6
   expand-template: ^2.0.3
   form-data: ^3.0.0
   jsome: ^2.5.0
-  jsonfile: ^5.0.0
+  jsonfile: ^6.0.1
   mergerino: ^0.4.0
   mocha: ^8.0.1
   node-fetch: ^2.6.0
-  prettier: ^1.19.1
+  prettier: ^2.0.5
