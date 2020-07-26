@@ -8,7 +8,7 @@ function parse_query(request_prop, value) {
   return {
     collection: collection_path.split('.'),
     requests: requests ? requests.split(',') : [],
-    request_prop
+    request_prop,
   };
 }
 
@@ -50,7 +50,7 @@ function process_args(process_argv) {
       '-r': '--raw-response',
       '-p': '--request-prop',
       '-s': '--schema',
-      '-v': '--version'
+      '-v': '--version',
       // '-t': '--schema-type',
     });
   } catch (err) {
@@ -76,7 +76,7 @@ function process_args(process_argv) {
       opts.hide_vars = get_or([], '--hide', args);
       opts.command.args = map(parse, argv.slice(1));
       opts.command.config = {
-        raw_output: Boolean(args['--raw-response'])
+        raw_output: Boolean(args['--raw-response']),
       };
 
       if (args['--interactive']) {
@@ -87,7 +87,7 @@ function process_args(process_argv) {
     }
     case 'run-all': {
       opts.command.config = {
-        raw_output: Boolean(args['--raw-response'])
+        raw_output: Boolean(args['--raw-response']),
       };
       break;
     }
@@ -100,7 +100,7 @@ function process_args(process_argv) {
       opts.command.args = map(parse, argv.slice(2));
       opts.command.config = {
         arg_separator: get_or(' ', '--arg-separator', args),
-        syntax: argv[1]
+        syntax: argv[1],
       };
       break;
     }
@@ -114,7 +114,7 @@ function process_args(process_argv) {
       opts.command.config = {
         arg_separator: get_or('\n', '--arg-separator', args),
         exclude: parse(get_or('', '--exclude', args).split(' ')),
-        syntax: get_or('curl', '--example-syntax', args)
+        syntax: get_or('curl', '--example-syntax', args),
       };
       break;
     }
@@ -122,7 +122,7 @@ function process_args(process_argv) {
       opts.command.args = argv.slice(2);
       opts.command.config = {
         path: argv[1],
-        request_prop: get_or('id', '--request-prop', args)
+        request_prop: get_or('id', '--request-prop', args),
       };
       break;
     }
@@ -134,14 +134,14 @@ function process_args(process_argv) {
       return {
         err: {
           message,
-          info: 'use the --help command to learn about the available commands'
-        }
+          info: 'use the --help command to learn about the available commands',
+        },
       };
   }
 
   if (is_nil(args['--schema'])) {
     return {
-      err: { message: 'must provide --schema with a path to a json file' }
+      err: { message: 'must provide --schema with a path to a json file' },
     };
   }
 
@@ -156,5 +156,5 @@ function process_args(process_argv) {
 module.exports = {
   parse_query,
   param_to_env,
-  process_args
+  process_args,
 };

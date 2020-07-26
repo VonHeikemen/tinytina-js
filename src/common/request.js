@@ -20,26 +20,26 @@ function make_post(fetch, URLSearchParams, FormData, handle_files) {
         ...opts,
         headers: {
           ...(opts.headers ? opts.headers : {}),
-          'Content-type': 'application/json'
+          'Content-type': 'application/json',
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
     },
     form(url, body, files, opts) {
-      const handler = form => handle_files(files, form);
+      const handler = (form) => handle_files(files, form);
       return fetch(url, {
         method: 'POST',
         ...opts,
-        body: create_form(FormData, body, handler)
+        body: create_form(FormData, body, handler),
       });
     },
     urlencoded(url, body, files, opts) {
       return fetch(url, {
         method: 'POST',
         ...opts,
-        body: create_form(URLSearchParams, body)
+        body: create_form(URLSearchParams, body),
       });
-    }
+    },
   };
 }
 
@@ -74,10 +74,10 @@ function make_request(http, params) {
 }
 
 function run(http, create_options, requests) {
-  return requests.map(params => http(create_options(params)));
+  return requests.map((params) => http(create_options(params)));
 }
 
-module.exports = function(
+module.exports = function (
   fetch,
   URLSearchParams,
   FormData,
@@ -88,10 +88,10 @@ module.exports = function(
     get: fetch,
     post: make_post(fetch, URLSearchParams, FormData, handle_files),
     URLSearchParams,
-    handle_download
+    handle_download,
   });
 
   return {
-    http: run.bind(null, http)
+    http: run.bind(null, http),
   };
 };

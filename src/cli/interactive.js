@@ -2,7 +2,7 @@ const { Form, Toggle } = require('enquirer');
 const { bind, is_nil, is_empty, reduce, reject } = require('../common/utils');
 
 function form_to_request(form) {
-  const to_request = function(state, value, key) {
+  const to_request = function (state, value, key) {
     let input_key = key.split('.');
 
     if (input_key.length < 2) {
@@ -36,10 +36,10 @@ async function next_action(message, fn, req) {
     message,
     name: 'question',
     enabled: 'Yes',
-    disabled: 'No'
+    disabled: 'No',
   })
     .run()
-    .catch(e => false);
+    .catch((e) => false);
 
   return answer ? fn(req) : true;
 }
@@ -53,10 +53,10 @@ async function run_interactive(
   create_options,
   request
 ) {
-  const handle_error = e =>
+  const handle_error = (e) =>
     Promise.reject(e === '' ? 'Request cancelled by user' : e);
 
-  const run_prompt = async req => {
+  const run_prompt = async (req) => {
     const options = create_options(form_to_request, req);
 
     if (options.error) {
@@ -76,5 +76,5 @@ module.exports = {
   form_to_request,
   interactive: run_interactive,
   prompt,
-  next_action
+  next_action,
 };

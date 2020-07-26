@@ -10,7 +10,7 @@ const {
   version,
   list,
   convert_to,
-  doc
+  doc,
 } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
 const { add_global, fetch, http, log, pretty_err } = require('./cli/effects');
@@ -24,7 +24,7 @@ async function main({
   hide_vars,
   schema_path,
   schema_type,
-  err = false
+  err = false,
 }) {
   if (err) {
     return Promise.reject(err);
@@ -42,7 +42,7 @@ async function main({
 
     const state = reader.create_state(schema, env_name, {
       extra_vars: env_vars,
-      hide_vars
+      hide_vars,
     });
 
     if (state.is_err) {
@@ -67,7 +67,7 @@ async function main({
       state = await create_state();
       return run
         .interactive(reader, state, command)
-        .map(eff => bind(eff, prompt, next_action));
+        .map((eff) => bind(eff, prompt, next_action));
     case 'run-all':
       state = await create_state();
       return run.all(reader, state, command.config);
@@ -84,6 +84,6 @@ async function main({
 }
 
 main(process_args(process.argv.slice(2)))
-  .then(res => res.cata(identity, reject))
-  .then(effect => effect({ add_global, fetch, http, log, require }))
-  .catch(e => console.error(pretty_err(process.argv.includes('--debug'), e)));
+  .then((res) => res.cata(identity, reject))
+  .then((effect) => effect({ add_global, fetch, http, log, require }))
+  .catch((e) => console.error(pretty_err(process.argv.includes('--debug'), e)));

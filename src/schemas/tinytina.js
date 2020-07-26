@@ -10,7 +10,7 @@ const {
   filter,
   reduce,
   pipe,
-  what_is
+  what_is,
 } = require('../common/utils');
 
 function escape_double_quotes(str) {
@@ -70,7 +70,7 @@ function full_url_request(URLSearchParams, env, request) {
   return {
     ...request,
     query: [],
-    url
+    url,
   };
 }
 
@@ -121,13 +121,13 @@ function query_id(collection, empty, ids) {
     }
   }
 
-  return empty.catchmap(msg => msg.concat(Array.from(query).join(', ')));
+  return empty.catchmap((msg) => msg.concat(Array.from(query).join(', ')));
 }
 
 function query_prop(collection, empty, query) {
-  let lowercase_query = map(str => str.toLowerCase(), query.requests);
+  let lowercase_query = map((str) => str.toLowerCase(), query.requests);
   let res = filter(
-    item =>
+    (item) =>
       lowercase_query.includes((item[query.request_prop] || '').toLowerCase()),
     collection.requests
   );
@@ -188,18 +188,18 @@ function get_requests(collections, query) {
       break;
   }
 
-  const append_err = msg => msg.concat(` in ${collection.id}`);
+  const append_err = (msg) => msg.concat(` in ${collection.id}`);
   return result.catchmap(append_err);
 }
 
 function build_fetch_options(env, request) {
   const parse = expand(env);
-  const parse_form = function(state, input) {
+  const parse_form = function (state, input) {
     state[input.name] = parse(input.value);
     return state;
   };
 
-  const expand_data = data => reduce(parse_form, {}, data);
+  const expand_data = (data) => reduce(parse_form, {}, data);
 
   let result = { opts: {} };
   result.url = parse(request.url);
@@ -273,13 +273,13 @@ function list_requests(collection) {
     return path;
   };
 
-  const get_metadata = src => i => ({
+  const get_metadata = (src) => (i) => ({
     name: i.name || '',
     description: i.description || '',
     id: i.id || '',
     url: i.url || '',
     depth: max_depth + 1 - src.depth,
-    path: make_path(src.depth, src.id)
+    path: make_path(src.depth, src.id),
   });
 
   const fn = (acc, req, src) => {
@@ -292,7 +292,7 @@ function list_requests(collection) {
 }
 
 function list_to_string(show, list) {
-  const to_string = req => {
+  const to_string = (req) => {
     let str = req.path;
     switch (show) {
       case 'path':
@@ -355,16 +355,16 @@ function build_prompt_options(state, form_to_request, request) {
     return { error: "Can't render form. 'data' needs to be an array" };
   }
 
-  const form_header = message => [
+  const form_header = (message) => [
     { name: '_', message: '  ', role: 'separator', initial: '  ' },
     { name: '_', message, role: 'separator', initial: '  ' },
-    { name: '_', role: 'separator', initial: '  ' }
+    { name: '_', role: 'separator', initial: '  ' },
   ];
 
-  const form_input = prefix => ({ name, value }) => ({
+  const form_input = (prefix) => ({ name, value }) => ({
     name: `${prefix}.${name}`,
     message: name,
-    initial: parse_val(state, value)
+    initial: parse_val(state, value),
   });
 
   const to_choice = (header, key) =>
@@ -377,18 +377,18 @@ function build_prompt_options(state, form_to_request, request) {
       name: '_',
       message: 'Env',
       initial: `${state.env_name || ''} ✖`,
-      disabled: '  '
+      disabled: '  ',
     },
     {
       name: 'url',
       message: 'URL',
-      initial: parse_val(state, request.url)
+      initial: parse_val(state, request.url),
     },
     {
       name: 'method',
       message: 'Method',
-      initial: method
-    }
+      initial: method,
+    },
   ];
 
   opts.choices = choices.concat(
@@ -398,9 +398,9 @@ function build_prompt_options(state, form_to_request, request) {
     to_choice('Files', 'files')
   );
 
-  const add_payload = form => ({ ...form, _: { description: opts.message } });
+  const add_payload = (form) => ({ ...form, _: { description: opts.message } });
 
-  opts.result = form => form_to_request(add_payload(form));
+  opts.result = (form) => form_to_request(add_payload(form));
 
   return opts;
 }
@@ -433,7 +433,7 @@ function build_command_curl(env, request, { arg_separator }) {
         result.push(...map(form_urlencoded, request.data));
         break;
       case 'json':
-        const content_type = (request.headers || []).find(header =>
+        const content_type = (request.headers || []).find((header) =>
           header.value.toLowerCase().includes('content-type: application/json')
         );
         if (is_empty(content_type)) {
@@ -562,7 +562,7 @@ function build_shell_command(
 ) {
   switch (syntax) {
     case 'curl':
-      return Result.Ok(req =>
+      return Result.Ok((req) =>
         build_command_curl(
           state.env,
           full_url_request(URLSearchParams, state.env, req),
@@ -570,11 +570,11 @@ function build_shell_command(
         )
       );
     case 'httpie':
-      return Result.Ok(req =>
+      return Result.Ok((req) =>
         build_command_httpie(state.env, req, { arg_separator })
       );
     case 'wget':
-      return Result.Ok(req =>
+      return Result.Ok((req) =>
         build_command_wget(
           URLSearchParams,
           state.env,
@@ -585,7 +585,7 @@ function build_shell_command(
     default:
       return Result.Err({
         message: `invalid parameter ${syntax}`,
-        info: 'The supported parameters are "curl", "httpie" and "wget"'
+        info: 'The supported parameters are "curl", "httpie" and "wget"',
       });
   }
 }
@@ -598,26 +598,26 @@ function build_doc_markdown(
   const parse = expand(state.env);
 
   const exclude_query = map(
-    q => ({ ...q, collection: q.collection.join('.') }),
+    (q) => ({ ...q, collection: q.collection.join('.') }),
     exclude
   );
 
   const example_cmd = build_shell_command(URLSearchParams, state, {
     arg_separator,
-    syntax
+    syntax,
   })
-    .map(cmd => request => `\`\`\`\n${cmd(request)}\n\`\`\`\n\n`)
+    .map((cmd) => (request) => `\`\`\`\n${cmd(request)}\n\`\`\`\n\n`)
     .unwrap_or(() => '');
 
-  const heading = num => str => `${'#'.repeat(num)} ${str}\n`;
+  const heading = (num) => (str) => `${'#'.repeat(num)} ${str}\n`;
   const h2 = heading(2);
   const h3 = heading(3);
   const h4 = heading(4);
 
-  const join_lines = str => (Array.isArray(str) ? str.join('\n') : str);
-  const multiline = str => `\n${join_lines(str)}\n\n`;
+  const join_lines = (str) => (Array.isArray(str) ? str.join('\n') : str);
+  const multiline = (str) => `\n${join_lines(str)}\n\n`;
 
-  const get_extra_headers = function(data) {
+  const get_extra_headers = function (data) {
     if (!Array.isArray(data)) {
       return [];
     }
@@ -625,17 +625,17 @@ function build_doc_markdown(
     let headers = new Set();
 
     for (const param of data) {
-      Object.keys(param.metadata || {}).forEach(k => headers.add(k));
+      Object.keys(param.metadata || {}).forEach((k) => headers.add(k));
     }
 
     return Array.from(headers);
   };
 
-  const create_table = function(data) {
+  const create_table = function (data) {
     let headers = get_extra_headers(data);
     let body = '\n| ';
 
-    const cell = str => ` ${is_nil(str) ? '' : str} |`;
+    const cell = (str) => ` ${is_nil(str) ? '' : str} |`;
 
     body += cell('Field');
     body += cell('Value');
@@ -673,11 +673,11 @@ function build_doc_markdown(
     return body + '\n';
   };
 
-  const collection_to_markdown = function(path, collections) {
+  const collection_to_markdown = function (path, collections) {
     let body = '';
     for (const collection of collections) {
       const current_path = path + collection.id;
-      let filter = exclude_query.find(q => q.collection == current_path);
+      let filter = exclude_query.find((q) => q.collection == current_path);
 
       if (is_nil(filter)) {
         filter = { requests: [], request_prop: 'id' };
@@ -770,5 +770,5 @@ module.exports = {
   build_command_httpie,
   build_command_wget,
   build_shell_command,
-  build_doc_markdown
+  build_doc_markdown,
 };

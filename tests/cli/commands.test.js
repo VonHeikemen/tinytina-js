@@ -12,11 +12,11 @@ const expected = require('../schemas/fixtures/expected-data');
 
 const { reader, create_state, create_command } = command_context();
 
-const identity = arg => arg;
-const constant = arg => () => arg;
+const identity = (arg) => arg;
+const constant = (arg) => () => arg;
 const stub = constant(identity);
 
-const prompt = options => {
+const prompt = (options) => {
   options.show = false;
   const form = new Form(options);
   form.once('run', async () => {
@@ -32,7 +32,7 @@ const next_action = (message, fn, req) => {
 
 suite('# cli - run command');
 
-test('get one request from one collection', async function() {
+test('get one request from one collection', async function () {
   const command = create_command('run', 'short-id:also-short');
   const effect = run
     .collection(reader, create_state(), command)
@@ -49,7 +49,7 @@ test('get one request from one collection', async function() {
   t.equal(requests[0].id, 'also-short', '');
 });
 
-test('get multiple requests from one collection', async function() {
+test('get multiple requests from one collection', async function () {
   const command = create_command(
     'run',
     'short-id.oh-look:guess-filename,download-face'
@@ -70,7 +70,7 @@ test('get multiple requests from one collection', async function() {
   t.equal(requests[1].id, 'guess-filename', '');
 });
 
-test('get all requests from one collection', async function() {
+test('get all requests from one collection', async function () {
   const command = create_command('run', 'another');
   const effect = run
     .collection(reader, create_state(), command)
@@ -86,7 +86,7 @@ test('get all requests from one collection', async function() {
   t.equal(requests.length, 3, 'retrieved all requests');
 });
 
-test('get requests from multiple collections', async function() {
+test('get requests from multiple collections', async function () {
   const command = create_command(
     'run',
     'short-id:also-short',
@@ -107,7 +107,7 @@ test('get requests from multiple collections', async function() {
   t.equal(col_2[0].id, 'has-id', '');
 });
 
-test('report collection not found', function() {
+test('report collection not found', function () {
   const command = create_command('run', 'wrong-id:also-wrong');
   const effect = run
     .collection(reader, create_state(), command)
@@ -121,7 +121,7 @@ test('report collection not found', function() {
   t.equal(lines[1], 'could not find collection wrong-id', '');
 });
 
-test('report request not found', function() {
+test('report request not found', function () {
   const command = create_command('run', 'short-id:also-wrong');
   const effect = run
     .collection(reader, create_state(), command)
@@ -135,7 +135,7 @@ test('report request not found', function() {
   t.equal(lines[1], 'could not find request id also-wrong in short-id', '');
 });
 
-test('capture request error', async function() {
+test('capture request error', async function () {
   const command = create_command('run', 'short-id:also-short');
   const effect = run
     .collection(reader, create_state(), command)
@@ -152,16 +152,16 @@ test('capture request error', async function() {
 
 suite('# cli - run command interactive mode');
 
-test('process one request', async function() {
+test('process one request', async function () {
   const path = 'short-id:also-short';
   const expected_request = reader
     .get_requests(create_state().collection, parse_query('id', path))
-    .chain(res => res[0]);
+    .chain((res) => res[0]);
 
   const command = create_command('run-interactive', path);
   const effect = run
     .interactive(reader, create_state(), command)
-    .map(eff => bind(eff, prompt, next_action))
+    .map((eff) => bind(eff, prompt, next_action))
     .cata(identity, constant);
 
   const request = await effect({ http: stub });
@@ -169,7 +169,7 @@ test('process one request', async function() {
   t.equal(request.url, expected_request.url, '');
 });
 
-test("don't allow multiple requests", function() {
+test("don't allow multiple requests", function () {
   const command = create_command(
     'run-interactive',
     'short-id:also-short',
@@ -177,7 +177,7 @@ test("don't allow multiple requests", function() {
   );
   const effect = run
     .interactive(reader, create_state(), command)
-    .map(eff => bind(eff, prompt, next_action))
+    .map((eff) => bind(eff, prompt, next_action))
     .cata(identity, constant);
 
   const report = effect({ http: stub });
@@ -186,11 +186,11 @@ test("don't allow multiple requests", function() {
   t.equal(report, "Can't process multiple requests in interactive mode", '');
 });
 
-test("don't allow request.data object", async function() {
+test("don't allow request.data object", async function () {
   const command = create_command('run-interactive', 'short-id:json-data');
   const effect = run
     .interactive(reader, create_state(), command)
-    .map(eff => bind(eff, prompt, next_action))
+    .map((eff) => bind(eff, prompt, next_action))
     .cata(identity, constant);
 
   const report = await effect({ http: stub }).catch(identity);
@@ -199,11 +199,11 @@ test("don't allow request.data object", async function() {
   t.equal(report, "Can't render form. 'data' needs to be an array", '');
 });
 
-test('report collection not found', function() {
+test('report collection not found', function () {
   const command = create_command('run', 'wrong-id:also-wrong');
   const effect = run
     .interactive(reader, create_state(), command)
-    .map(eff => bind(eff, prompt, next_action))
+    .map((eff) => bind(eff, prompt, next_action))
     .cata(identity, constant);
 
   const report = effect({ http: stub });
@@ -213,11 +213,11 @@ test('report collection not found', function() {
   t.equal(report, 'could not find collection wrong-id', '');
 });
 
-test('report request not found', function() {
+test('report request not found', function () {
   const command = create_command('run', 'short-id:also-wrong');
   const effect = run
     .interactive(reader, create_state(), command)
-    .map(eff => bind(eff, prompt, next_action))
+    .map((eff) => bind(eff, prompt, next_action))
     .cata(identity, constant);
 
   const report = effect({ http: stub });
@@ -228,7 +228,7 @@ test('report request not found', function() {
 
 suite('# cli - run-all command');
 
-test('runs all requests in the schema', function() {
+test('runs all requests in the schema', function () {
   const command = create_command('run-all', 'short-id:also-short');
   const effect = run
     .all(reader, create_state(), command.config)
@@ -241,7 +241,7 @@ test('runs all requests in the schema', function() {
 
 suite('# cli - version command');
 
-test('version is in sync with package.json', function() {
+test('version is in sync with package.json', function () {
   const pkg_version = process.env.npm_package_version || false;
 
   t.ok(pkg_version, 'pkg_version is empty');
@@ -250,7 +250,7 @@ test('version is in sync with package.json', function() {
 
 suite('# cli - list command');
 
-test('render list of requests paths', function() {
+test('render list of requests paths', function () {
   const command = { name: 'list', args: ['path'] };
   const effect = list(reader, create_state(), command).cata(identity, constant);
 
@@ -260,9 +260,9 @@ test('render list of requests paths', function() {
 
 suite('# cli - convert-to command');
 
-test('render a list of "curl" commands', function() {
+test('render a list of "curl" commands', function () {
   const separator = ' \\\n';
-  const join = arr => arr.join(separator);
+  const join = (arr) => arr.join(separator);
 
   const command = create_command('convert-to', 'short-id:also-short,json-data');
   command.config = { syntax: 'curl', arg_separator: separator };
@@ -280,9 +280,9 @@ test('render a list of "curl" commands', function() {
   );
 });
 
-test('render a list of "httpie" commands', function() {
+test('render a list of "httpie" commands', function () {
   const separator = ' \\\n';
-  const join = arr => arr.join(separator);
+  const join = (arr) => arr.join(separator);
 
   const command = create_command('convert-to', 'short-id:also-short,json-data');
   command.config = { syntax: 'httpie', arg_separator: separator };
@@ -300,9 +300,9 @@ test('render a list of "httpie" commands', function() {
   );
 });
 
-test('render a list of "wget" commands', function() {
+test('render a list of "wget" commands', function () {
   const separator = ' \\\n';
-  const join = arr => arr.join(separator);
+  const join = (arr) => arr.join(separator);
 
   const command = create_command('convert-to', 'short-id:also-short');
   command.config = { syntax: 'wget', arg_separator: separator };
@@ -322,12 +322,12 @@ test('render a list of "wget" commands', function() {
 
 suite('# cli - markdown command');
 
-test('render a "markdown" document', function() {
+test('render a "markdown" document', function () {
   const command = create_command('md');
   command.config = {
     syntax: 'curl',
     arg_separator: '\n',
-    exclude: [parse_query('id', 'another:has-id')]
+    exclude: [parse_query('id', 'another:has-id')],
   };
 
   const effect = doc(reader, create_state(), command).cata(identity, constant);
@@ -338,14 +338,14 @@ test('render a "markdown" document', function() {
 
 suite('# cli - use-script command');
 
-test('exported function gets command line arguments', async function() {
+test('exported function gets command line arguments', async function () {
   const command = {
     name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
-      request_prop: 'id'
-    }
+      request_prop: 'id',
+    },
   };
 
   const context = {};
@@ -360,14 +360,14 @@ test('exported function gets command line arguments', async function() {
   t.deepEqual(result, ['somearg'], 'function receives the right arguments');
 });
 
-test('context object has the right shape', function() {
+test('context object has the right shape', function () {
   const command = {
     name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
-      request_prop: 'id'
-    }
+      request_prop: 'id',
+    },
   };
 
   const context = {};
@@ -406,21 +406,23 @@ test('context object has the right shape', function() {
   );
 });
 
-test('context object contains env variables', function() {
+test('context object contains env variables', function () {
   const command = {
     name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
-      request_prop: 'id'
-    }
+      request_prop: 'id',
+    },
   };
 
   const state = create_state();
   const context = {};
   const add_global = (key, value) => (context[key] = value);
 
-  const effect = run.use_script(reader, state, command).cata(identity, constant);
+  const effect = run
+    .use_script(reader, state, command)
+    .cata(identity, constant);
 
   effect({ add_global, fetch: stub, require: stub });
 
@@ -431,37 +433,37 @@ test('context object contains env variables', function() {
   );
 });
 
-test('http utilities can extract data from the schema', async function() {
+test('http utilities can extract data from the schema', async function () {
   const command = {
     name: 'use-script',
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
-      request_prop: 'id'
-    }
+      request_prop: 'id',
+    },
   };
 
   const expected = {
     opts: {
       headers: {
-        Authorization: '{api-key}'
+        Authorization: '{api-key}',
       },
-      method: 'POST'
+      method: 'POST',
     },
     url: 'http://localhost:3000/service/register',
     query: {
-      stuff: 'this goes in the URL as a querystring'
+      stuff: 'this goes in the URL as a querystring',
     },
     files: {
-      image: '/tmp/yourface.jpg'
+      image: '/tmp/yourface.jpg',
     },
     type: 'form',
     body: {
       name: 'some test value',
       lastname: 'body-ish',
       email: 'not-real-deal',
-      code: 'no-one-should-see-me'
-    }
+      code: 'no-one-should-see-me',
+    },
   };
 
   const query = 'short-id:also-short';
@@ -471,10 +473,13 @@ test('http utilities can extract data from the schema', async function() {
   const fetch = (options, request) => [
     Promise.resolve({
       json: () => options(request[0]),
-      text: () => options(request[0])
-    })];
+      text: () => options(request[0]),
+    }),
+  ];
 
-  const effect = run.use_script(reader, state, command).cata(identity, constant);
+  const effect = run
+    .use_script(reader, state, command)
+    .cata(identity, constant);
 
   effect({ add_global, fetch, require: stub });
 
@@ -490,7 +495,7 @@ test('http utilities can extract data from the schema', async function() {
   t.deepEqual(json_data, expected, 'json can get the request data');
 });
 
-test('exposes external dependencies', function() {
+test('exposes external dependencies', function () {
   const baretest = require('baretest');
   const jsonfile = require('jsonfile');
   const jsome = require('jsome');
@@ -500,14 +505,16 @@ test('exposes external dependencies', function() {
     args: ['somearg'],
     config: {
       path: './path-to-script.js',
-      request_prop: 'id'
-    }
+      request_prop: 'id',
+    },
   };
 
   const context = {};
   const add_global = (key, value) => (context[key] = value);
 
-  const effect = run.use_script(reader, create_state(), command).cata(identity, constant);
+  const effect = run
+    .use_script(reader, create_state(), command)
+    .cata(identity, constant);
 
   effect({ add_global, fetch: stub, require: stub });
 

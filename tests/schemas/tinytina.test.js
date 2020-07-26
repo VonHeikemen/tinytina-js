@@ -8,11 +8,11 @@ const expected = require('./fixtures/expected-data');
 
 suite('# tinytina schema reader');
 
-test('create state env from json schema', function() {
+test('create state env from json schema', function () {
   const state = reader
     .create_state(schema, 'development', {
       extra_vars: { 'api-key': '123' },
-      hide_vars: ['secret-thing']
+      hide_vars: ['secret-thing'],
     })
     .unwrap_or({});
 
@@ -21,7 +21,7 @@ test('create state env from json schema', function() {
   t.deepEqual(state.env, expected.env, '');
 });
 
-test('populate collection array', function() {
+test('populate collection array', function () {
   const state = reader.create_state(schema, 'development').unwrap_or({});
 
   t.ok(Array.isArray(state.collection), 'collection is an array');
@@ -31,19 +31,19 @@ test('populate collection array', function() {
   t.deepEqual([collection_1, collection_2], ['short-id', 'another'], '');
 });
 
-test('get collection by id', function() {
+test('get collection by id', function () {
   const state = reader.create_state(schema, 'development').unwrap_or({});
 
   const collection = reader.get_collection(state.collection, [
     'short-id',
-    'oh-look'
+    'oh-look',
   ]);
   t.ok(collection, 'collection is not empty');
   t.equal(collection.id, 'oh-look', '');
   t.equal(collection.name, 'A nested collection', '');
 });
 
-test('get request by id', function() {
+test('get request by id', function () {
   const state = reader.create_state(schema, 'development').unwrap_or({});
   const query = parse_query('id', 'short-id.oh-look:guess-filename');
 
@@ -53,7 +53,7 @@ test('get request by id', function() {
   t.equal(requests[0].id, 'guess-filename', '');
 });
 
-test('get request by name', function() {
+test('get request by name', function () {
   const state = reader.create_state(schema, 'development').unwrap_or({});
   const query = parse_query('name', 'short-id:the full name of the thing');
 
@@ -63,7 +63,7 @@ test('get request by name', function() {
   t.equal(requests[0].id, 'also-short', '');
 });
 
-test('get all requests from a collection', function() {
+test('get all requests from a collection', function () {
   const state = reader.create_state(schema, 'development').unwrap_or({});
 
   const requests = reader.get_all_requests(state.collection);
@@ -76,10 +76,10 @@ test('get all requests from a collection', function() {
   );
 });
 
-test('transform request from schema to a fetch options object', function() {
+test('transform request from schema to a fetch options object', function () {
   const state = reader
     .create_state(schema, 'development', {
-      extra_vars: { 'api-key': '456' }
+      extra_vars: { 'api-key': '456' },
     })
     .unwrap_or({});
   const query = parse_query('id', 'short-id:also-short');
@@ -91,7 +91,7 @@ test('transform request from schema to a fetch options object', function() {
   t.deepEqual(options, expected.fetch_options, '');
 });
 
-test('fetch options: handle request.data object', function() {
+test('fetch options: handle request.data object', function () {
   const expected_options = {
     ...expected.fetch_options,
     files: undefined,
@@ -100,14 +100,14 @@ test('fetch options: handle request.data object', function() {
       ...expected.fetch_options.body,
       lastname: 'body',
       code: {
-        payload: 'no-one-should-see-me'
-      }
-    }
+        payload: 'no-one-should-see-me',
+      },
+    },
   };
 
   const state = reader
     .create_state(schema, 'development', {
-      extra_vars: { 'api-key': '456' }
+      extra_vars: { 'api-key': '456' },
     })
     .unwrap_or({});
 
@@ -120,10 +120,10 @@ test('fetch options: handle request.data object', function() {
   t.deepEqual(options, expected_options, '');
 });
 
-test('transform request from schema to a prompt options object', function() {
+test('transform request from schema to a prompt options object', function () {
   const state = reader
     .create_state(schema, 'development', {
-      extra_vars: { 'api-key': '456' }
+      extra_vars: { 'api-key': '456' },
     })
     .unwrap_or({});
   const query = parse_query('id', 'short-id:also-short');
@@ -138,19 +138,19 @@ test('transform request from schema to a prompt options object', function() {
   t.deepEqual(options, expected.prompt_options, '');
 });
 
-test('get flatten list of requests metadata', function() {
+test('get flatten list of requests metadata', function () {
   const expected_data = {
     name: 'deeply nested',
     description: 'A nested request',
     id: 'lonely-get',
     url: '{host}/service/download',
     depth: 3,
-    path: 'short-id.oh-look.3rd-level'
+    path: 'short-id.oh-look.3rd-level',
   };
 
   const state = reader
     .create_state(schema, 'development', {
-      extra_vars: { 'api-key': '456' }
+      extra_vars: { 'api-key': '456' },
     })
     .unwrap_or({});
 
@@ -165,7 +165,7 @@ test('get flatten list of requests metadata', function() {
   t.deepEqual(requests[4], expected_data, 'got expected metadata');
 });
 
-test('transform metadata list to a string', function() {
+test('transform metadata list to a string', function () {
   const args = [
     {
       name: 'request 1',
@@ -173,7 +173,7 @@ test('transform metadata list to a string', function() {
       id: 'req-1',
       url: '{host}/service/download',
       depth: 1,
-      path: 'short-id'
+      path: 'short-id',
     },
     {
       name: 'request 2',
@@ -181,7 +181,7 @@ test('transform metadata list to a string', function() {
       id: 'req-2',
       url: '{host}/service/download',
       depth: 2,
-      path: 'short-id.oh-look'
+      path: 'short-id.oh-look',
     },
     {
       name: 'request 3',
@@ -189,8 +189,8 @@ test('transform metadata list to a string', function() {
       id: '',
       url: '{host}/service/request-3',
       depth: 2,
-      path: 'short-id.oh-look'
-    }
+      path: 'short-id.oh-look',
+    },
   ];
 
   const expected = `

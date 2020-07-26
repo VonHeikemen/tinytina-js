@@ -6,18 +6,18 @@ const example_schema = require('../schemas/fixtures/tinytina-schema.json');
 const fake_args = (name = '', ...args) => ({
   command: {
     name,
-    args
+    args,
   },
   schema_path: './example.json',
   schema_type: 'tinytina',
   env_name: 'dev',
   env_vars: {
     token: '123',
-    api: 'secret'
-  }
+    api: 'secret',
+  },
 });
 
-const cli_input = args =>
+const cli_input = (args) =>
   [
     '--schema',
     './example.json',
@@ -26,14 +26,14 @@ const cli_input = args =>
     '--global',
     'token:123',
     '--global',
-    'api:secret'
+    'api:secret',
   ].concat(args);
 
 function command_context() {
   const parse = bind(parse_query, 'id');
   const context = {
     reader: tinytina,
-    schema: example_schema
+    schema: example_schema,
   };
 
   context.create_state = () =>
@@ -44,9 +44,9 @@ function command_context() {
   context.create_command = (name, ...args) => ({
     name,
     config: {
-      raw_output: false
+      raw_output: false,
     },
-    args: map(parse, args)
+    args: map(parse, args),
   });
 
   return context;
@@ -55,5 +55,5 @@ function command_context() {
 module.exports = {
   fake_args,
   cli_input,
-  command_context
+  command_context,
 };

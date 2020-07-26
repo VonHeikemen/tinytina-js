@@ -1,74 +1,74 @@
 function Err(arg) {
-  var return_err = function() {
+  var return_err = function () {
     return Err(arg);
   };
 
   return {
     map: return_err,
     chain: return_err,
-    altchain: function(fn) {
+    altchain: function (fn) {
       return fn(arg);
     },
     ap: return_err,
-    cata: function(ok_path, err_path) {
+    cata: function (ok_path, err_path) {
       return err_path(arg);
     },
 
-    catchmap: function(fn) {
+    catchmap: function (fn) {
       return Err(fn(arg));
     },
-    bimap: function(fn_ok, fn_err) {
+    bimap: function (fn_ok, fn_err) {
       return Err(fn_err(arg));
     },
-    swap: function() {
+    swap: function () {
       return Ok(arg);
     },
 
-    unwrap_or: function(arg) {
+    unwrap_or: function (arg) {
       return arg;
     },
 
     is_ok: false,
-    is_err: true
+    is_err: true,
   };
 }
 
 function Ok(value) {
   return {
-    map: function(fn) {
+    map: function (fn) {
       return Ok(fn(value));
     },
-    chain: function(fn) {
+    chain: function (fn) {
       return fn(value);
     },
-    altchain: function() {
+    altchain: function () {
       return Ok(value);
     },
-    ap: function(functor) {
+    ap: function (functor) {
       return functor.map(function _ap(fn) {
         return fn(value);
       });
     },
-    cata: function(ok_path, err_path) {
+    cata: function (ok_path, err_path) {
       return ok_path(value);
     },
 
-    catchmap: function() {
+    catchmap: function () {
       return Ok(value);
     },
-    bimap: function(fn_ok, fn_err) {
+    bimap: function (fn_ok, fn_err) {
       return Ok(fn_ok(value));
     },
-    swap: function() {
+    swap: function () {
       return Err(value);
     },
 
-    unwrap_or: function() {
+    unwrap_or: function () {
       return value;
     },
 
     is_ok: true,
-    is_err: false
+    is_err: false,
   };
 }
 
@@ -88,5 +88,5 @@ module.exports = {
   of: Result,
   Err,
   Ok,
-  tryit
+  tryit,
 };

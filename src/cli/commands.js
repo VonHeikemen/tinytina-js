@@ -43,8 +43,8 @@ function search_requests(reader, state, args) {
   let requests = { success: [], failed: [] };
   for (let query of args) {
     reader.get_requests(state.collection, query).cata(
-      result => requests.success.push(result),
-      err => requests.failed.push(err)
+      (result) => requests.success.push(result),
+      (err) => requests.failed.push(err)
     );
   }
 
@@ -70,7 +70,7 @@ function run_collection(reader, state, { config, args }) {
   if (is_empty(args)) {
     return Result.Err({
       message: 'Empty argument list for "run"',
-      info: 'To run all requests use the "run-all" command'
+      info: 'To run all requests use the "run-all" command',
     });
   }
 
@@ -98,7 +98,7 @@ function run_interactive(reader, state, { config, args }) {
 
   const request = reader
     .get_requests(state.collection, args[0])
-    .map(res => res[0]);
+    .map((res) => res[0]);
 
   if (request.is_err) {
     return request;
@@ -108,7 +108,7 @@ function run_interactive(reader, state, { config, args }) {
   const prompt_options = bind(reader.build_prompt_options, state);
 
   function _effect(prompt, next_action, { http }) {
-    const run = req => http(fetch_options, config.raw_output)([req]);
+    const run = (req) => http(fetch_options, config.raw_output)([req]);
     return interactive(
       { run, next_action, prompt },
       prompt_options,
@@ -122,7 +122,7 @@ function run_interactive(reader, state, { config, args }) {
 function run_script(reader, state, { config, args }) {
   const parse = bind(parse_query, config.request_prop);
   const fetch_options = bind(reader.build_fetch_options, state.env);
-  const allow_one = query => req =>
+  const allow_one = (query) => (req) =>
     req.length === 1
       ? Result.Ok(req)
       : Result.Err(
@@ -130,32 +130,34 @@ function run_script(reader, state, { config, args }) {
             `Found ${req.length} results for the query ${query}.`
         );
 
-  const get_request = function(query) {
+  const get_request = function (query) {
     return search_requests(reader, state, [parse(query)])
-      .map(res => res[0])
+      .map((res) => res[0])
       .chain(allow_one(query));
   };
 
-  const get_data = function(query) {
+  const get_data = function (query) {
     return get_request(query).cata(
-      req => Promise.resolve(fetch_options(req[0])),
-      err => Promise.reject(err)
+      (req) => Promise.resolve(fetch_options(req[0])),
+      (err) => Promise.reject(err)
     );
   };
 
-  const create_run = fetch => (query, options) => {
+  const create_run = (fetch) => (query, options) => {
     const result = get_request(query);
-    const create_options = request => merge(fetch_options(request), options);
+    const create_options = (request) => merge(fetch_options(request), options);
 
     return result.cata(
-      req => fetch(create_options, req)[0],
-      err => Promise.reject(err)
+      (req) => fetch(create_options, req)[0],
+      (err) => Promise.reject(err)
     );
   };
 
-  const create_json = run => (...args) => run(...args).then(res => res.json());
+  const create_json = (run) => (...args) =>
+    run(...args).then((res) => res.json());
 
-  const create_send = run => (...args) => run(...args).then(res => res.text());
+  const create_send = (run) => (...args) =>
+    run(...args).then((res) => res.text());
 
   async function _effect({ add_global, fetch, require }) {
     const run = create_run(fetch);
@@ -168,18 +170,18 @@ function run_script(reader, state, { config, args }) {
         get_data,
         run,
         send: create_send(run),
-        json: create_json(run)
+        json: create_json(run),
       },
       json: {
         print,
         parse: parse_json,
         readfile: jsonfile.readFile,
-        writefile: jsonfile.writeFile
+        writefile: jsonfile.writeFile,
       },
       env: {
         name: state.env_name,
-        data: state.env
-      }
+        data: state.env,
+      },
     };
 
     add_global('tinytina', context);
@@ -200,13 +202,13 @@ function list(reader, state, { args }) {
 function convert_to(reader, state, { args, config }) {
   const result = is_empty(args)
     ? Result.Ok(reader.get_all_requests(state.collection))
-    : search_requests(reader, state, args).map(reqs => reqs.flat());
+    : search_requests(reader, state, args).map((reqs) => reqs.flat());
 
   const build_command = reader
     .build_shell_command(URLSearchParams, state, config)
-    .map(fn => bind(map, fn));
+    .map((fn) => bind(map, fn));
 
-  return result.ap(build_command).map(arr => arr.join('\n\n'));
+  return result.ap(build_command).map((arr) => arr.join('\n\n'));
 }
 
 function doc(reader, state, { config }) {
@@ -218,11 +220,11 @@ module.exports = {
     all: run_all,
     collection: run_collection,
     interactive: run_interactive,
-    use_script: run_script
+    use_script: run_script,
   },
   help: show(help),
   version: show(version),
   list: show(list),
   convert_to: show_result(convert_to),
-  doc: show(doc)
+  doc: show(doc),
 };

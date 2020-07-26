@@ -1,7 +1,7 @@
 const init_state = () => ({
   env: {},
   hidden_env_vars: [],
-  collection: []
+  collection: [],
 });
 
 function create_env(env_name, state) {
@@ -11,5 +11,5 @@ function create_env(env_name, state) {
 
 module.exports = {
   init_state,
-  create_env
+  create_env,
 };

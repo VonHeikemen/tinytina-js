@@ -21,7 +21,7 @@ jsome.colors = {
   attr: 'cyan', // objects attributes -> { attr : value }
   quot: 'white', // strings quotes -> "..."
   punc: 'white', // commas seperating arrays and objects values -> [ , , , ]
-  brack: 'white' // for both {} and []
+  brack: 'white', // for both {} and []
 };
 
 jsome.params.lintable = true;
@@ -44,7 +44,7 @@ const {
   then,
   pipe,
   reject,
-  promise_all
+  promise_all,
 } = require('../common/utils');
 const { Ok, tryit } = require('../common/Result');
 
@@ -56,7 +56,7 @@ function handle_files(files, form) {
 
 async function handle_download(http_request, output, url) {
   const stat = tryit(fs.lstatSync, output.path).unwrap_or({
-    isDirectory: () => false
+    isDirectory: () => false,
   });
 
   if (!stat.isDirectory()) {
@@ -94,15 +94,15 @@ function safe_parse(text) {
 }
 
 function log(raw_output) {
-  return async arg => {
+  return async (arg) => {
     raw_output ? console.log(arg) : safe_parse(arg);
   };
 }
 
 function http_client(get_options, raw_output) {
-  return requests => {
-    const get_text = res => res.text();
-    const show_response = promise =>
+  return (requests) => {
+    const get_text = (res) => res.text();
+    const show_response = (promise) =>
       promise.then(get_text).then(log(raw_output));
 
     const run = pipe(
@@ -163,5 +163,5 @@ module.exports = {
   http: http_client,
   log,
   log_effect,
-  pretty_err
+  pretty_err,
 };

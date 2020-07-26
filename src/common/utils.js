@@ -25,7 +25,7 @@ function what_is(arg) {
     undefined: () => is == '[object Undefined]',
     null: () => is == '[object Null]',
     number: () => is == '[object Number]',
-    func: () => is == '[object Function]'
+    func: () => is == '[object Function]',
   };
 }
 
@@ -77,7 +77,7 @@ function filter(fn, arg) {
   }
 
   if (is.promise()) {
-    return arg.then(val => (fn(val) ? val : Promise.reject(val)));
+    return arg.then((val) => (fn(val) ? val : Promise.reject(val)));
   }
 }
 
@@ -142,11 +142,11 @@ function resolved(arg) {
 }
 
 function then(fn) {
-  return promise => promise.then(fn);
+  return (promise) => promise.then(fn);
 }
 
 function pcatch(fn) {
-  return promise => promise.catch(fn);
+  return (promise) => promise.catch(fn);
 }
 
 function promise_all(arr) {
@@ -183,5 +183,5 @@ module.exports = {
   then,
   pcatch,
   promise_all,
-  pipe
+  pipe,
 };

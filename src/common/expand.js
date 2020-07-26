@@ -1,11 +1,11 @@
 const create_expand = require('expand-template');
 
-module.exports = function(opts) {
+module.exports = function (opts) {
   const expand = create_expand(opts);
 
   return function _expand(env, template) {
     if (arguments.length === 1) {
-      return tmpl => _expand(env, tmpl);
+      return (tmpl) => _expand(env, tmpl);
     }
 
     const is = Object.prototype.toString.call(template);

@@ -10,5 +10,5 @@ function create_reader(schema_type) {
 }
 
 module.exports = {
-  create_reader
+  create_reader,
 };
