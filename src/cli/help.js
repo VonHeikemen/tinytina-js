@@ -169,6 +169,9 @@ module.exports = function help() {
         - json
           A function that uses 'run' to send a request and gives you back the body of the response as a json object.
           It takes the same parameters as 'run'.
+      - FormData
+        A constructor that creates "multipart/form-data" streams. This is handled by the package form-data.
+        Find out more about it here: https://www.npmjs.com/package/form-data
       - suite
         A function that creates a "test suite". This test suite in handled by the package 'baretest'
         Find out more about it here: https://www.npmjs.com/package/baretest

@@ -266,5 +266,6 @@ The `global.tinytina` object within the script has the following properties.
 |`http.run`          | A function that uses `fetch` to send a request, it takes two parameters: 1. The query of the request you want to run 2. a data object that can replace the original data of the request. This object can be anything that the package '[mergerino](https://www.npmjs.com/package/mergerino)' can handle. |
 |`http.send`         | A function that uses `http.run` to send a request and gives you back the body of the response as text. It takes the same parameters as `http.run`. |
 |`http.json`         | A function that uses `http.run` to send a request and gives you back the body of the response as a json object. It takes the same parameters as `http.run`. |
+|`FormData`          | A constructor that creates "multipart/form-data" streams. This is handled by the package [form-data](https://www.npmjs.com/package/form-data) |
 |`suite`             | A function that creates a "test suite". This test suite in handled by the package [baretest](https://www.npmjs.com/package/baretest). |
 
