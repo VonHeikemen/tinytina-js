@@ -382,7 +382,7 @@ test('context object has the right shape', function () {
   t.ok('tinytina' in context, 'the context tinytina exists');
 
   t.deepEqual(
-    ['argv', 'suite', 'print', 'http', 'json', 'env'],
+    ['argv', 'suite', 'FormData', 'print', 'http', 'json', 'env'],
     Object.keys(context.tinytina),
     'tinytina object has all the dependencies'
   );
@@ -499,6 +499,7 @@ test('exposes external dependencies', function () {
   const baretest = require('baretest');
   const jsonfile = require('jsonfile');
   const jsome = require('jsome');
+  const FormData = require('form-data');
 
   const command = {
     name: 'use-script',
@@ -518,10 +519,11 @@ test('exposes external dependencies', function () {
 
   effect({ add_global, fetch: stub, require: stub });
 
-  const { suite, json, print } = context.tinytina;
+  const { suite, json, print, FormData: MyFormData } = context.tinytina;
 
   t.ok(baretest == suite);
   t.ok(print == jsome);
   t.ok(jsonfile.readFile == json.readfile);
   t.ok(jsonfile.writeFile == json.writefile);
+  t.ok(FormData == MyFormData);
 });

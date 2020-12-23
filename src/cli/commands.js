@@ -5,6 +5,7 @@ const suite = require('baretest');
 const merge = require('mergerino');
 const fetch = require('node-fetch');
 const jsonfile = require('jsonfile');
+const FormData = require('form-data');
 
 const { interactive } = require('./interactive');
 const { log_effect, print, jsome } = require('./effects');
@@ -164,6 +165,7 @@ function run_script(reader, state, { config, args }) {
     const context = {
       argv: args,
       suite,
+      FormData,
       print: jsome,
       http: {
         fetch,
