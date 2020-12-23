@@ -29,12 +29,12 @@
     "expand-template": "^2.0.3",
     "form-data": "^3.0.0",
     "jsome": "^2.5.0",
-    "jsonfile": "^6.0.1",
+    "jsonfile": "^6.1.0",
     "mergerino": "^0.4.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "mocha": "^8.0.1",
-    "prettier": "^2.0.5"
+    "mocha": "^8.2.1",
+    "prettier": "^2.2.1"
   }
 }
