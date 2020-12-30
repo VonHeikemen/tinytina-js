@@ -20,8 +20,8 @@
   "author": "Heiker (https://github.com/VonHeikemen)",
   "license": "MIT",
   "dependencies": {
-    "@zeit/arg": "^1.0.0",
     "ansi-colors": "^4.1.1",
+    "arg": "^5.0.0",
     "array-flat-polyfill": "^1.0.1",
     "baretest": "^2.0.0",
     "color-support": "^1.1.3",

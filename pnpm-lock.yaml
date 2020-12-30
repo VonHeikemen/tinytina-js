@@ -1,6 +1,6 @@
 dependencies:
-  '@zeit/arg': 1.0.0
   ansi-colors: 4.1.1
+  arg: 5.0.0
   array-flat-polyfill: 1.0.1
   baretest: 2.0.0
   color-support: 1.1.3
@@ -20,11 +20,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==
-  /@zeit/arg/1.0.0:
-    deprecated: '"@zeit/arg" is deprecated in favor of "arg".'
-    dev: false
-    resolution:
-      integrity: sha512-SDP3IvXR6Dm1OlltSs2qp43CASYyc9QVZLYtFNRlE7HvghLE6sjXTNzVcEhYyt8Jc0YNhpTE+TITUwnTgR4Feg==
   /ansi-colors/4.1.1:
     engines:
       node: '>=6'
@@ -71,6 +66,10 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-mM8522psRCqzV+6LhomX5wgp25YVibjh8Wj23I5RPkPppSVSjyKD2A2mBJmWGa+KN7f2D6LNh9jkBCeyLktzjg==
+  /arg/5.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-4P8Zm2H+BRS+c/xX1LrHw0qKpEhdlZjLCgWy+d78T9vqa2Z2SiD2wMrYuWIAFy5IZUD7nnNXroRttz+0RzlrzQ==
   /argparse/1.0.10:
     dependencies:
       sprintf-js: 1.0.3
@@ -1156,8 +1155,8 @@ packages:
     resolution:
       integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 specifiers:
-  '@zeit/arg': ^1.0.0
   ansi-colors: ^4.1.1
+  arg: ^5.0.0
   array-flat-polyfill: ^1.0.1
   baretest: ^2.0.0
   color-support: ^1.1.3

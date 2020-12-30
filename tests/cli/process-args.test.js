@@ -60,9 +60,9 @@ test('gather arguments for "run" in interactive mode', function () {
       'password',
       '--hide',
       'api',
+      '--interactive',
       'run',
       'auth:login',
-      '--interactive',
     ])
   );
 
@@ -189,7 +189,7 @@ test('return error when --schema is missing', function () {
 });
 
 test('return error when unknown argument is given', function () {
-  const expected = 'Unknown or unexpected option: --dont';
+  const expected = 'unknown or unexpected option: --dont';
   const result = process_args(['--dont', 'dev', 'run', 'auth:login']);
 
   t.equal(result.err.message, expected, '');

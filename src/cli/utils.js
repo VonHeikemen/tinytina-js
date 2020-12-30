@@ -1,4 +1,4 @@
-const arg = require('@zeit/arg');
+const arg = require('arg');
 
 const { bind, get_or, is_nil, map, reduce } = require('../common/utils');
 
@@ -26,7 +26,15 @@ function param_to_env(state, value) {
 
 function process_args(process_argv) {
   try {
-    var args = arg(process_argv, {
+    const global_arg = {
+      '--debug': Boolean,
+      '--help': Boolean,
+      '--version': Boolean,
+      '-h': '--help',
+      '-v': '--version',
+    };
+
+    var args = arg({
       '--arg-separator': String,
       '--env': String,
       '--example-syntax': String,
@@ -37,22 +45,31 @@ function process_args(process_argv) {
       '--raw-response': Boolean,
       '--request-prop': String,
       '--schema': String,
-      '--debug': Boolean,
-      '--help': Boolean,
-      '--version': Boolean,
       // '--schema-type': String,
 
       '-e': '--env',
       '-g': '--global',
-      '-h': '--help',
-      '-hi': '--hide',
+      '-H': '--hide',
       '-i': '--interactive',
       '-r': '--raw-response',
       '-p': '--request-prop',
       '-s': '--schema',
-      '-v': '--version',
       // '-t': '--schema-type',
+
+      ...global_arg
+    }, {
+      argv: process_argv,
+      stopAtPositional: true,
+      permissive: true
     });
+
+    args = {
+      ...arg(global_arg, {
+        argv: args._,
+        permissive: true
+      }),
+      ...args
+    };
   } catch (err) {
     return { err };
   }
@@ -126,10 +143,15 @@ function process_args(process_argv) {
       };
       break;
     }
-    default:
-      const message = opts.command.name.length
-        ? `${opts.command.name} is not a valid command`
-        : 'Must provide a command';
+    default: {
+      const name = opts.command.name;
+      let message = 'Must provide a command';
+
+      if(name.startsWith('-')) {
+        message = `unknown or unexpected option: ${name}`;
+      } else if(name.length) {
+        message = `${opts.command.name} is not a valid command`; 
+      }
 
       return {
         err: {
@@ -137,6 +159,7 @@ function process_args(process_argv) {
           info: 'use the --help command to learn about the available commands',
         },
       };
+    }
   }
 
   if (is_nil(args['--schema'])) {
