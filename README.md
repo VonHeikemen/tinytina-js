@@ -88,7 +88,7 @@ Use a custom script with valid javascript syntax to execute any kind of extra lo
   Set an environment variable from the command-line.
 
 - `-H`, `--hide`<br/>
-  It prevents from showing the environment variable in interactive mode.
+  It hides the specified environment variable in interactive mode, also works in commands like 'markdown' and 'convert-to'.
 
 - `-i`, `--interactive`<br/>
   It presents a "form" with the requests params before running it.
@@ -103,13 +103,13 @@ Use a custom script with valid javascript syntax to execute any kind of extra lo
   In the 'init' command, try to write a file even if it already exist 
 
 - `--arg-separator`<br />
-Set the delimeter between arguments in the commands shown by 'convert-to.'
+  Set the delimeter between arguments in the commands shown by 'convert-to.'
 
 - `--example-syntax`<br />
-Set the example commands shown by the 'markdown' command.
+  Set the example commands shown by the 'markdown' command.
 
 - `--exclude`<br />
-Exclude a collection or a request shown by the 'markdown' command.
+  Exclude a collection or a request shown by the 'markdown' command.
 
 ### Examples
 Assuming you downloaded the release version and made it executable with the name tinytina.

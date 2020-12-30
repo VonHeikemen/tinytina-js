@@ -50,7 +50,7 @@ module.exports = function help() {
       -s, --schema                        Path to the json file containing the collection
       -e, --env                           Specifies the set of variables that can be used in a collection
       -g, --global <name>:<value>         Set an environment variable from the command-line
-      -H, --hide                          It prevents from showing the environment variable in interactive mode
+      -H, --hide                          It hides the specified environment variable.
       -i, --interactive                   It presents a "form" with the requests params before running it
       -p, --request-prop                  Change the search criteria ("id" by default) to another property
       -r, --raw-response                  Disable the colors and format of the response body
