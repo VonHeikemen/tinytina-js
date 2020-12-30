@@ -7,6 +7,7 @@ module.exports = function help() {
       tinytina --help
       tinytina --version
       tinytina list [arg]
+      tinytina [OPTIONS] init filepath
       tinytina [OPTIONS] run [<collection-id>:<request-id> ...]
       tinytina [OPTIONS] run-all 
       tinytina [OPTIONS] convert-to command-name [<collection-id>:<request-id> ...]
@@ -14,6 +15,10 @@ module.exports = function help() {
       tinytina [OPTIONS] use-script script-path [args]
 
   COMMANDS
+      init:
+          Generate a json schema and writes to the given filepath. If the file exists it would abort 
+          the process. Use the --force option to overwrite the file if it exists.
+
       run:
           Use it to query the json schema and execute a one or more requests. The query is made of two parts
           separated by ':', the first part is the collection id and the other is a comma separated list of 
@@ -45,10 +50,11 @@ module.exports = function help() {
       -s, --schema                        Path to the json file containing the collection
       -e, --env                           Specifies the set of variables that can be used in a collection
       -g, --global <name>:<value>         Set an environment variable from the command-line
-      -hi, --hide                         It prevents from showing the environment variable in interactive mode
+      -H, --hide                          It prevents from showing the environment variable in interactive mode
       -i, --interactive                   It presents a "form" with the requests params before running it
       -p, --request-prop                  Change the search criteria ("id" by default) to another property
       -r, --raw-response                  Disable the colors and format of the response body
+      -f, --force                         In the 'init' command, try to write a file even if it already exist
       --arg-separator                     Set the delimeter of the shell commands in 'convert-to' and 'markdown'
       --example-syntax                    Set the example commands shown by the 'markdown' command
       --exclude                           Exclude a collection or a request shown by the 'markdown' command
@@ -178,6 +184,9 @@ module.exports = function help() {
 
   EXAMPLES
       Assuming "tinytina" is an executable already in your PATH.
+
+      Create a schema file:
+          tinytina init ./path-to-schema.json
 
       Running a single request:
           tinytina --schema ./example.json run auth:login

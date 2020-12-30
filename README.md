@@ -45,6 +45,9 @@ Clone/download the repository and install the dependencies yourself.
 
 ### Using the CLI
 
+#### `tinytina [OPTIONS] init filepath`
+Generate a json schema and writes to the given filepath. If the file exists it would abort the process. Use the --force option to overwrite the file if it exists.
+
 #### `tinytina [OPTIONS] run <collection-id>:<request-id> ...`
 The `run` command is used to query the json schema for a one or more requests to execute. This command has a limited interactive mode that you can use to inspect the data before you send it.
 
@@ -84,7 +87,7 @@ Use a custom script with valid javascript syntax to execute any kind of extra lo
 - `-g`, `--global` `<name>:<value>` <br/>
   Set an environment variable from the command-line.
 
-- `-hi`, `--hide`<br/>
+- `-H`, `--hide`<br/>
   It prevents from showing the environment variable in interactive mode.
 
 - `-i`, `--interactive`<br/>
@@ -95,6 +98,9 @@ Use a custom script with valid javascript syntax to execute any kind of extra lo
 
 - `-r`, `--raw-response`<br/>
   Disable the colors and format of the response body.
+
+- `-f`, `--force`<br/>
+  In the 'init' command, try to write a file even if it already exist 
 
 - `--arg-separator`<br />
 Set the delimeter between arguments in the commands shown by 'convert-to.'
@@ -107,6 +113,11 @@ Exclude a collection or a request shown by the 'markdown' command.
 
 ### Examples
 Assuming you downloaded the release version and made it executable with the name tinytina.
+
+Create a schema file:
+```
+tinytina init ./path-to-schema.json
+```
 
 Running a single request:
 ```
