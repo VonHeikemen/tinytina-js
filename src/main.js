@@ -1,6 +1,10 @@
 #! /usr/bin/env node
 
 require('array-flat-polyfill');
+
+const fs = require('fs');
+const file_exists = fs.existsSync;
+
 const jsonfile = require('jsonfile');
 
 const { prompt, next_action } = require('./cli/interactive');
@@ -10,6 +14,7 @@ const {
   version,
   list,
   convert_to,
+  create_schema,
   doc,
 } = require('./cli/commands.js');
 const { process_args } = require('./cli/utils');
@@ -74,6 +79,8 @@ async function main({
     case 'convert-to':
       state = await create_state();
       return convert_to(reader, state, command);
+    case 'init':
+      return create_schema(reader, command);
     case 'markdown':
       state = await create_state();
       return doc(reader, state, command);
@@ -85,5 +92,5 @@ async function main({
 
 main(process_args(process.argv.slice(2)))
   .then((res) => res.cata(identity, reject))
-  .then((effect) => effect({ add_global, fetch, http, log, require }))
+  .then((effect) => effect({ add_global, fetch, http, log, require, jsonfile, file_exists }))
   .catch((e) => console.error(pretty_err(process.argv.includes('--debug'), e)));

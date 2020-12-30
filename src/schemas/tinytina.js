@@ -756,6 +756,43 @@ function build_doc_markdown(
   return docs;
 }
 
+function build_schema() {
+  return {
+    "version": 1,
+    "name": "A web API",
+    "description": "An awesome API",
+    "hide": [],
+    "globals": {},
+    "envs": {
+      "dev": {},
+      "test": {},
+      "prod": {}
+    },
+    "collections": [
+      {
+        "id": "test-id",
+        "name": "Test collection",
+        "description": "This is an awesome collection",
+        "url": "https://example.com",
+        "method": "POST",
+        "headers": [
+          { "name": "some", "value": "thing" }
+        ],
+        "query": [
+          { "name": "some-query", "value": "thing" }
+        ],
+        "data": [
+          { "name": "some-field", "value": "thing" }
+        ],
+        "files": [
+          { "name": "some-file", "value": "a/path" }
+        ],
+        "collections": []
+      }
+    ]
+  };
+}
+
 module.exports = {
   create_state,
   full_url_request,
@@ -771,4 +808,5 @@ module.exports = {
   build_command_wget,
   build_shell_command,
   build_doc_markdown,
+  build_schema
 };

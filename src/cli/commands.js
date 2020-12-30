@@ -13,7 +13,7 @@ const help = require('./help');
 const version = require('./version');
 
 const { parse_query } = require('./utils');
-const { bind, is_empty, map, reduce } = require('../common/utils');
+const { bind, is_empty, map, reduce, what_is } = require('../common/utils');
 const Result = require('../common/Result');
 
 function parse_json(str) {
@@ -217,6 +217,31 @@ function doc(reader, state, { config }) {
   return reader.build_doc_markdown(URLSearchParams, state, config);
 }
 
+function create_schema(reader, { config }) {
+  if(!what_is(config.path).string()) {
+    return Result.Err('Must provide a filepath for the schema');
+  }
+
+  const schema = reader.build_schema();
+
+  async function _effect({ jsonfile, file_exists, log }) {
+    const filepath = resolve(config.path);
+
+    if(file_exists(filepath) && !config.force) {
+      return Promise.reject({
+        message: `The file ${filepath} already exists`,
+        info: 'Use the --force/-f flag to overwrite the file'
+      });
+    }
+
+    await jsonfile.writeFile(filepath, schema, { spaces: 2 });
+
+    return log(false)('Schema created');
+  }
+
+  return Result.Ok(_effect);
+}
+
 module.exports = {
   run: {
     all: run_all,
@@ -229,4 +254,5 @@ module.exports = {
   list: show(list),
   convert_to: show_result(convert_to),
   doc: show(doc),
+  create_schema,
 };

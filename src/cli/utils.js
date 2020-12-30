@@ -39,6 +39,7 @@ function process_args(process_argv) {
       '--env': String,
       '--example-syntax': String,
       '--exclude': String,
+      '--force': Boolean,
       '--global': [String],
       '--hide': [String],
       '--interactive': Boolean,
@@ -48,6 +49,7 @@ function process_args(process_argv) {
       // '--schema-type': String,
 
       '-e': '--env',
+      '-f': '--force',
       '-g': '--global',
       '-H': '--hide',
       '-i': '--interactive',
@@ -142,6 +144,13 @@ function process_args(process_argv) {
         request_prop: get_or('id', '--request-prop', args),
       };
       break;
+    }
+    case 'init': {
+      opts.command.config = {
+        path: argv[1],
+        force: get_or(false, '--force', args)
+      };
+      return opts;
     }
     default: {
       const name = opts.command.name;

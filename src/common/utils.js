@@ -21,6 +21,7 @@ function what_is(arg) {
     val: () => is,
     object: () => is == '[object Object]',
     array: () => is == '[object Array]',
+    string: () => is == '[object String]',
     promise: () => is == '[object Promise]',
     undefined: () => is == '[object Undefined]',
     null: () => is == '[object Null]',
