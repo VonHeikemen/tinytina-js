@@ -2,6 +2,7 @@ const expand = require('../common/expand')();
 const { init_state, create_env } = require('../common/state');
 const Result = require('../common/Result');
 const {
+  bind,
   get_or,
   map,
   shallow_copy,
@@ -324,6 +325,10 @@ function parse_val(state, value) {
   const not_hidden = (val, key) => !state.hidden_env_vars.includes(key);
   let parse = expand(filter(not_hidden, state.env));
 
+  if(what_is(value).object()) {
+    return parse(parse(value));
+  }
+
   return parse(parse(String(value)));
 }
 
@@ -405,8 +410,8 @@ function build_prompt_options(state, form_to_request, request) {
   return opts;
 }
 
-function build_command_curl(env, request, { arg_separator }) {
-  const parse = expand(env);
+function build_command_curl(state, request, { arg_separator }) {
+  const parse = bind(parse_val, state);
   const safe_parse = pipe(parse, escape_double_quotes);
   const type = get_post_type(request);
 
@@ -454,8 +459,8 @@ function build_command_curl(env, request, { arg_separator }) {
   return result.join(arg_separator);
 }
 
-function build_command_httpie(env, request, { arg_separator }) {
-  const parse = expand(env);
+function build_command_httpie(state, request, { arg_separator }) {
+  const parse = bind(parse_val, state);
   const safe_parse = pipe(parse, escape_double_quotes);
   const method = get_method(request);
   const type = get_post_type(request);
@@ -526,8 +531,8 @@ function build_command_httpie(env, request, { arg_separator }) {
   return result.join(arg_separator);
 }
 
-function build_command_wget(URLSearchParams, env, request, { arg_separator }) {
-  const parse = expand(env);
+function build_command_wget(URLSearchParams, state, request, { arg_separator }) {
+  const parse = bind(parse_val, state);
   const safe_parse = pipe(parse, escape_double_quotes);
   const type = get_post_type(request);
 
@@ -564,20 +569,20 @@ function build_shell_command(
     case 'curl':
       return Result.Ok((req) =>
         build_command_curl(
-          state.env,
+          state,
           full_url_request(URLSearchParams, state.env, req),
           { arg_separator }
         )
       );
     case 'httpie':
       return Result.Ok((req) =>
-        build_command_httpie(state.env, req, { arg_separator })
+        build_command_httpie(state, req, { arg_separator })
       );
     case 'wget':
       return Result.Ok((req) =>
         build_command_wget(
           URLSearchParams,
-          state.env,
+          state,
           full_url_request(URLSearchParams, state.env, req),
           { arg_separator }
         )

@@ -100,7 +100,7 @@ const curl_commands = [
     '--form "email=not-real-deal"',
     '--form "code=no-one-should-see-me"',
     '--form "image=@/tmp/yourface.jpg"',
-    '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    '"{host}/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
   ],
   [
     'curl --request POST',
@@ -114,13 +114,13 @@ const curl_commands = [
     "payload": "no-one-should-see-me"
   }
 }'`,
-    '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    '"{host}/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
   ]
 ];
 
 const httpie_commands = [
   [
-    'http --form POST "http://localhost:3000/service/register"',
+    'http --form POST "{host}/service/register"',
     'Authorization:"{api-key}"',
     'stuff=="this goes in the URL as a querystring"',
     'name="some test value"',
@@ -130,7 +130,7 @@ const httpie_commands = [
     'image@/tmp/yourface.jpg'
   ],
   [
-    'http --json POST "http://localhost:3000/service/register"',
+    'http --json POST "{host}/service/register"',
     'Authorization:"{api-key}"',
     'stuff=="this goes in the URL as a querystring"',
     'name="some test value"',
@@ -145,7 +145,7 @@ const wget_commands = [
     'wget --method POST',
     '--header "Authorization: {api-key}"',
     '--body-data "name=some+test+value&lastname=body-ish&email=not-real-deal&code=no-one-should-see-me"',
-    '"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
+    '"{host}/service/register?stuff=this+goes+in+the+URL+as+a+querystring"'
   ]
 ]; 
 
@@ -194,7 +194,7 @@ curl --request POST
 --form "email=not-real-deal"
 --form "code=no-one-should-see-me"
 --form "image=@/tmp/yourface.jpg"
-"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"
+"{host}/service/register?stuff=this+goes+in+the+URL+as+a+querystring"
 \`\`\`
 
 ### json-data
@@ -232,7 +232,7 @@ curl --request POST
     "payload": "no-one-should-see-me"
   }
 }'
-"http://localhost:3000/service/register?stuff=this+goes+in+the+URL+as+a+querystring"
+"{host}/service/register?stuff=this+goes+in+the+URL+as+a+querystring"
 \`\`\`
 
 ## A nested collection
@@ -248,13 +248,13 @@ I hope you see where i'm going with this
 
 \`\`\`
 curl --request GET
-"http://localhost:3000/service/download?other-stuff=no+method%3F+Don%27t+worry%2C+this+is+GET"
+"{host}/service/download?other-stuff=no+method%3F+Don%27t+worry%2C+this+is+GET"
 \`\`\`
 
 ### guess-filename
 \`\`\`
 curl --request GET
-"http://localhost:3000/service/download"
+"{host}/service/download"
 \`\`\`
 
 ## 3rd-level
@@ -264,7 +264,7 @@ A nested request
 
 \`\`\`
 curl --request GET
-"http://localhost:3000/service/download"
+"{host}/service/download"
 \`\`\`
 
 ## another
