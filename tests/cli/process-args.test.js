@@ -178,6 +178,22 @@ test('gather arguments for "use-script" command', function () {
   t.deepEqual(result, expected, 'arguments object has the right shape');
 });
 
+test('gather arguments for "init" command', function() {
+  const expected = {
+    command: {
+      name: 'init',
+      config: {
+        path: './myfile.json',
+        force: true
+      }
+    }
+  };
+
+  const result = process_args(cli_input(['--force', 'init', './myfile.json']));
+
+  t.deepEqual(result, expected, 'arguments object has the right shape');
+});
+
 test('return error when --schema is missing', function () {
   const expected = {
     err: { message: 'must provide --schema with a path to a json file' },

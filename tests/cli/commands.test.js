@@ -1,10 +1,11 @@
 const t = require('assert').strict;
+const { resolve } = require('path');
 
 const { Form } = require('enquirer');
 
 const { is_empty, bind } = require('../../src/common/utils');
 const { parse_query } = require('../../src/cli/utils');
-const { run, list, convert_to, doc } = require('../../src/cli/commands');
+const { run, list, convert_to, doc, create_schema } = require('../../src/cli/commands');
 const version = require('../../src/cli/version');
 const { command_context } = require('./helpers');
 
@@ -526,4 +527,91 @@ test('exposes external dependencies', function () {
   t.ok(jsonfile.readFile == json.readfile);
   t.ok(jsonfile.writeFile == json.writefile);
   t.ok(FormData == MyFormData);
+});
+
+suite('# cli - init command');
+
+test('tries to write json schema in filesystem', async function () {
+  const command = {
+    name: 'init',
+    config: {
+      path: './myfile.json',
+      force: false
+    }
+  };
+
+  const expected = [
+    resolve(command.config.path),
+    reader.build_schema(),
+    { spaces: 2 }
+  ];
+
+  const effect = create_schema(reader, command).cata(identity, constant);
+  let file_intent = [];
+
+  const file_exists = constant(false);
+  const jsonfile = {
+    async writeFile(...args) {
+      file_intent = args;
+    }
+  };
+
+  const result = await effect({ log: stub, file_exists, jsonfile });
+
+  t.deepEqual(file_intent, expected, 'write functions receive correct arguments');
+});
+
+test('abort process if file exists', async function () {
+  const command = {
+    name: 'init',
+    config: {
+      path: './myfile.json',
+      force: false
+    }
+  };
+
+  const effect = create_schema(reader, command).cata(identity, constant);
+  let file_intent = [];
+
+  const file_exists = constant(true);
+  const jsonfile = {
+    async writeFile(...args) {
+      file_intent = args;
+    }
+  };
+
+  const result = await effect({ log: stub, file_exists, jsonfile }).catch(identity);
+
+  t.deepEqual(file_intent.length, 0, "write function doesn't get called");
+  t.deepEqual(result.message, `The file ${resolve(command.config.path)} already exists`, 'get correct error message');
+});
+
+test('tries to overwrite file if it exists', async function () {
+  const command = {
+    name: 'init',
+    config: {
+      path: './myfile.json',
+      force: true
+    }
+  };
+
+  const expected = [
+    resolve(command.config.path),
+    reader.build_schema(),
+    { spaces: 2 }
+  ];
+
+  const effect = create_schema(reader, command).cata(identity, constant);
+  let file_intent = [];
+
+  const file_exists = constant(true);
+  const jsonfile = {
+    async writeFile(...args) {
+      file_intent = args;
+    }
+  };
+
+  const result = await effect({ log: stub, file_exists, jsonfile });
+
+  t.deepEqual(file_intent, expected, 'write functions receive correct arguments');
 });
