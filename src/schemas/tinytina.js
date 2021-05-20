@@ -325,7 +325,7 @@ function parse_val(state, value) {
   const not_hidden = (val, key) => !state.hidden_env_vars.includes(key);
   let parse = expand(filter(not_hidden, state.env));
 
-  if(what_is(value).object()) {
+  if (what_is(value).object()) {
     return parse(parse(value));
   }
 
@@ -531,7 +531,12 @@ function build_command_httpie(state, request, { arg_separator }) {
   return result.join(arg_separator);
 }
 
-function build_command_wget(URLSearchParams, state, request, { arg_separator }) {
+function build_command_wget(
+  URLSearchParams,
+  state,
+  request,
+  { arg_separator }
+) {
   const parse = bind(parse_val, state);
   const safe_parse = pipe(parse, escape_double_quotes);
   const type = get_post_type(request);
@@ -763,38 +768,30 @@ function build_doc_markdown(
 
 function build_schema() {
   return {
-    "version": 1,
-    "name": "A web API",
-    "description": "An awesome API",
-    "hide": [],
-    "globals": {},
-    "envs": {
-      "dev": {},
-      "test": {},
-      "prod": {}
+    version: 1,
+    name: 'A web API',
+    description: 'An awesome API',
+    hide: [],
+    globals: {},
+    envs: {
+      dev: {},
+      test: {},
+      prod: {},
     },
-    "collections": [
+    collections: [
       {
-        "id": "test-id",
-        "name": "Test collection",
-        "description": "This is an awesome collection",
-        "url": "https://example.com",
-        "method": "POST",
-        "headers": [
-          { "name": "some", "value": "thing" }
-        ],
-        "query": [
-          { "name": "some-query", "value": "thing" }
-        ],
-        "data": [
-          { "name": "some-field", "value": "thing" }
-        ],
-        "files": [
-          { "name": "some-file", "value": "a/path" }
-        ],
-        "collections": []
-      }
-    ]
+        id: 'test-id',
+        name: 'Test collection',
+        description: 'This is an awesome collection',
+        url: 'https://example.com',
+        method: 'POST',
+        headers: [{ name: 'some', value: 'thing' }],
+        query: [{ name: 'some-query', value: 'thing' }],
+        data: [{ name: 'some-field', value: 'thing' }],
+        files: [{ name: 'some-file', value: 'a/path' }],
+        collections: [],
+      },
+    ],
   };
 }
 
@@ -813,5 +810,5 @@ module.exports = {
   build_command_wget,
   build_shell_command,
   build_doc_markdown,
-  build_schema
+  build_schema,
 };

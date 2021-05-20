@@ -218,7 +218,7 @@ function doc(reader, state, { config }) {
 }
 
 function create_schema(reader, { config }) {
-  if(!what_is(config.path).string()) {
+  if (!what_is(config.path).string()) {
     return Result.Err('Must provide a filepath for the schema');
   }
 
@@ -227,10 +227,10 @@ function create_schema(reader, { config }) {
   async function _effect({ jsonfile, file_exists, log }) {
     const filepath = resolve(config.path);
 
-    if(file_exists(filepath) && !config.force) {
+    if (file_exists(filepath) && !config.force) {
       return Promise.reject({
         message: `The file ${filepath} already exists`,
-        info: 'Use the --force/-f flag to overwrite the file'
+        info: 'Use the --force/-f flag to overwrite the file',
       });
     }
 

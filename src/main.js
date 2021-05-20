@@ -92,5 +92,7 @@ async function main({
 
 main(process_args(process.argv.slice(2)))
   .then((res) => res.cata(identity, reject))
-  .then((effect) => effect({ add_global, fetch, http, log, require, jsonfile, file_exists }))
+  .then((effect) =>
+    effect({ add_global, fetch, http, log, require, jsonfile, file_exists })
+  )
   .catch((e) => console.error(pretty_err(process.argv.includes('--debug'), e)));

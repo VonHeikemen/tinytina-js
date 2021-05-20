@@ -34,43 +34,46 @@ function process_args(process_argv) {
       '-v': '--version',
     };
 
-    var args = arg({
-      '--arg-separator': String,
-      '--env': String,
-      '--example-syntax': String,
-      '--exclude': String,
-      '--force': Boolean,
-      '--global': [String],
-      '--hide': [String],
-      '--interactive': Boolean,
-      '--raw-response': Boolean,
-      '--request-prop': String,
-      '--schema': String,
-      // '--schema-type': String,
+    var args = arg(
+      {
+        '--arg-separator': String,
+        '--env': String,
+        '--example-syntax': String,
+        '--exclude': String,
+        '--force': Boolean,
+        '--global': [String],
+        '--hide': [String],
+        '--interactive': Boolean,
+        '--raw-response': Boolean,
+        '--request-prop': String,
+        '--schema': String,
+        // '--schema-type': String,
 
-      '-e': '--env',
-      '-f': '--force',
-      '-g': '--global',
-      '-H': '--hide',
-      '-i': '--interactive',
-      '-r': '--raw-response',
-      '-p': '--request-prop',
-      '-s': '--schema',
-      // '-t': '--schema-type',
+        '-e': '--env',
+        '-f': '--force',
+        '-g': '--global',
+        '-H': '--hide',
+        '-i': '--interactive',
+        '-r': '--raw-response',
+        '-p': '--request-prop',
+        '-s': '--schema',
+        // '-t': '--schema-type',
 
-      ...global_arg
-    }, {
-      argv: process_argv,
-      stopAtPositional: true,
-      permissive: true
-    });
+        ...global_arg,
+      },
+      {
+        argv: process_argv,
+        stopAtPositional: true,
+        permissive: true,
+      }
+    );
 
     args = {
       ...arg(global_arg, {
         argv: args._,
-        permissive: true
+        permissive: true,
       }),
-      ...args
+      ...args,
     };
   } catch (err) {
     return { err };
@@ -148,7 +151,7 @@ function process_args(process_argv) {
     case 'init': {
       opts.command.config = {
         path: argv[1],
-        force: get_or(false, '--force', args)
+        force: get_or(false, '--force', args),
       };
       return opts;
     }
@@ -156,10 +159,10 @@ function process_args(process_argv) {
       const name = opts.command.name;
       let message = 'Must provide a command';
 
-      if(name.startsWith('-')) {
+      if (name.startsWith('-')) {
         message = `unknown or unexpected option: ${name}`;
-      } else if(name.length) {
-        message = `${opts.command.name} is not a valid command`; 
+      } else if (name.length) {
+        message = `${opts.command.name} is not a valid command`;
       }
 
       return {

@@ -5,7 +5,13 @@ const { Form } = require('enquirer');
 
 const { is_empty, bind } = require('../../src/common/utils');
 const { parse_query } = require('../../src/cli/utils');
-const { run, list, convert_to, doc, create_schema } = require('../../src/cli/commands');
+const {
+  run,
+  list,
+  convert_to,
+  doc,
+  create_schema,
+} = require('../../src/cli/commands');
 const version = require('../../src/cli/version');
 const { command_context } = require('./helpers');
 
@@ -536,14 +542,14 @@ test('tries to write json schema in filesystem', async function () {
     name: 'init',
     config: {
       path: './myfile.json',
-      force: false
-    }
+      force: false,
+    },
   };
 
   const expected = [
     resolve(command.config.path),
     reader.build_schema(),
-    { spaces: 2 }
+    { spaces: 2 },
   ];
 
   const effect = create_schema(reader, command).cata(identity, constant);
@@ -553,12 +559,16 @@ test('tries to write json schema in filesystem', async function () {
   const jsonfile = {
     async writeFile(...args) {
       file_intent = args;
-    }
+    },
   };
 
   const result = await effect({ log: stub, file_exists, jsonfile });
 
-  t.deepEqual(file_intent, expected, 'write functions receive correct arguments');
+  t.deepEqual(
+    file_intent,
+    expected,
+    'write functions receive correct arguments'
+  );
 });
 
 test('abort process if file exists', async function () {
@@ -566,8 +576,8 @@ test('abort process if file exists', async function () {
     name: 'init',
     config: {
       path: './myfile.json',
-      force: false
-    }
+      force: false,
+    },
   };
 
   const effect = create_schema(reader, command).cata(identity, constant);
@@ -577,13 +587,19 @@ test('abort process if file exists', async function () {
   const jsonfile = {
     async writeFile(...args) {
       file_intent = args;
-    }
+    },
   };
 
-  const result = await effect({ log: stub, file_exists, jsonfile }).catch(identity);
+  const result = await effect({ log: stub, file_exists, jsonfile }).catch(
+    identity
+  );
 
   t.deepEqual(file_intent.length, 0, "write function doesn't get called");
-  t.deepEqual(result.message, `The file ${resolve(command.config.path)} already exists`, 'get correct error message');
+  t.deepEqual(
+    result.message,
+    `The file ${resolve(command.config.path)} already exists`,
+    'get correct error message'
+  );
 });
 
 test('tries to overwrite file if it exists', async function () {
@@ -591,14 +607,14 @@ test('tries to overwrite file if it exists', async function () {
     name: 'init',
     config: {
       path: './myfile.json',
-      force: true
-    }
+      force: true,
+    },
   };
 
   const expected = [
     resolve(command.config.path),
     reader.build_schema(),
-    { spaces: 2 }
+    { spaces: 2 },
   ];
 
   const effect = create_schema(reader, command).cata(identity, constant);
@@ -608,10 +624,14 @@ test('tries to overwrite file if it exists', async function () {
   const jsonfile = {
     async writeFile(...args) {
       file_intent = args;
-    }
+    },
   };
 
   const result = await effect({ log: stub, file_exists, jsonfile });
 
-  t.deepEqual(file_intent, expected, 'write functions receive correct arguments');
+  t.deepEqual(
+    file_intent,
+    expected,
+    'write functions receive correct arguments'
+  );
 });
