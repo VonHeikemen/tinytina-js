@@ -280,3 +280,8 @@ The `global.tinytina` object within the script has the following properties.
 |`FormData`          | A constructor that creates "multipart/form-data" streams. This is handled by the package [form-data](https://www.npmjs.com/package/form-data) |
 |`suite`             | A function that creates a "test suite". This test suite in handled by the package [baretest](https://www.npmjs.com/package/baretest). |
 
+## Support
+
+If you find this tool useful and want to support my efforts, [buy me a coffee ☕](https://www.buymeacoffee.com/vonheikemen).
+
+[![buy me a coffee](https://res.cloudinary.com/vonheikemen/image/upload/v1618466522/buy-me-coffee_ah0uzh.png)](https://www.buymeacoffee.com/vonheikemen)
