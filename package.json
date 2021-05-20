@@ -7,7 +7,7 @@
     "tinytina": "src/main.js"
   },
   "scripts": {
-    "test": "mocha -r array-flat-polyfill --ui qunit tests/**/*.test.js",
+    "test": "mocha tests/**/*.test.js",
     "test:watch": "npm test -- --watch --reporter min",
     "format": "prettier --single-quote --write src/**/*.js src/*.js tests/**/*.js"
   },
@@ -27,14 +27,18 @@
     "color-support": "^1.1.3",
     "enquirer": "^2.3.6",
     "expand-template": "^2.0.3",
-    "form-data": "^3.0.0",
+    "form-data": "^4.0.0",
     "jsome": "^2.5.0",
     "jsonfile": "^6.1.0",
     "mergerino": "^0.4.0",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "mocha": "^8.2.1",
-    "prettier": "^2.2.1"
+    "mocha": "^8.4.0",
+    "prettier": "^2.3.0"
+  },
+  "mocha": {
+    "require": "array-flat-polyfill",
+    "ui": "qunit"
   }
 }
